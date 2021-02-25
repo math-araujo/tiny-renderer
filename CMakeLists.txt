@@ -3,6 +3,11 @@ project(tiny-renderer)
 
 add_subdirectory(external)
 
-add_executable(main src/main.cpp)
+add_executable(main
+    src/main.cpp 
+    src/geometry.hpp
+    src/model.hpp src/model.cpp
+    )
+    
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE tgaimage)

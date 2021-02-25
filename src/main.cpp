@@ -1,3 +1,4 @@
+#include "model.hpp"
 #include "tgaimage.h"
 #include <algorithm>
 #include <cmath>
@@ -56,14 +57,40 @@ void line(int x0, int y0, int x1, int y1, TGAImage& image, TGAColor color)
     }
 }
 
-int main()
-{   
-    TGAImage image{100, 100, TGAImage::RGB};
+int main(int argc, char* argv[])
+{
+    std::string filename{"obj/african_head.obj"}; 
+    if (argc == 2)
+    {
+        filename = argv[1];
+    }
+    
+    const Model model{filename};
+    const int width = 800;
+    const int height = 800;
+    TGAImage image{width, height, TGAImage::RGB};
     const TGAColor white{255, 255, 255, 255};
     const TGAColor red{255, 0, 0, 255};
-    line(13, 20, 80, 40, image, white);
-    line(20, 13, 40, 80, image, red);
-    line(80, 40, 13, 20, image, red);
+    
+    for (int i = 0; i < model.number_faces(); ++i)
+    {
+        const auto& face = model.face(i);
+
+        for (int j = 0; j < 3; ++j)
+        {
+            // Draw the triangle corresponding to the current face
+            Vector3f start{model.vertex(face[j])};
+            Vector3f end{model.vertex(face[(j + 1) % 3])};
+
+            int x0 = static_cast<int>((start.x + 1.0f) * width / 2.0f);
+            int y0 = static_cast<int>((start.y + 1.0f) * height / 2.0f);
+            int x1 = static_cast<int>((end.x + 1.0f) * width / 2.0f);
+            int y1 = static_cast<int>((end.y + 1.0f) * height / 2.0f);
+
+            line(x0, y0, x1, y1, image, white);
+        }
+    }
+
     image.flip_vertically(); // set origin to left bottom corner
     image.write_tga_file("output.tga");
 
