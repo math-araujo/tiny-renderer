@@ -73,7 +73,7 @@ struct Vector3
     Vector3& operator*=(double scale)
     {
         x = static_cast<T>(scale * x);
-        y = static_cast<T>(scale; * y);
+        y = static_cast<T>(scale * y);
         z = static_cast<T>(scale * z);
         return *this;
     }
@@ -175,6 +175,12 @@ inline Vector2<T> unit_vector(const Vector2<T>& v)
     return v / v.length();
 }
 
+template<typename T>
+inline double dot(const Vector2<T>& u, const Vector2<T>& v)
+{
+    return u.x * v.x + u.y * v.y;
+}
+
 // Vector3<T> functions
 
 template<typename T>
@@ -241,6 +247,20 @@ template<typename T>
 inline Vector3<T> unit_vector(const Vector3<T>& v)
 {
     return v / v.length();
+}
+
+template<typename T>
+inline double dot(const Vector3<T>& u, const Vector3<T>& v)
+{
+    return u.x * v.x + u.y * v.y + u.z * v.z;
+}
+
+template<typename T>
+inline Vector3<T> cross(const Vector3<T>& u, const Vector3<T>& v)
+{
+    return Vector3<T>{u.y * v.z - u.z * v.y,
+                    u.z * v.x - u.x * v.z,
+                    u.x * v.y - u.y * v.x};
 }
 
 #endif // GEOMETRY_HPP

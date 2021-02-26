@@ -158,6 +158,86 @@ void line_sweeping_fill_triangle(Vector2i vertex0, Vector2i vertex1, Vector2i ve
     }
 }
 
+Vector3f barycentric_coordinates(const std::array<Vector2i, 3>& vertices, Vector2i point)
+{
+    Vector3f normal = cross(Vector3f{static_cast<float>(vertices[1].x - vertices[0].x),
+                                     static_cast<float>(vertices[2].x - vertices[0].x),
+                                     static_cast<float>(vertices[0].x - point.x)},
+                            Vector3f{static_cast<float>(vertices[1].y - vertices[0].y),
+                                     static_cast<float>(vertices[2].y - vertices[0].y),
+                                     static_cast<float>(vertices[0].y - point.y)});
+                                     
+    if (std::abs(normal.z) < 1.0f)
+    { 
+        return Vector3f{-1.0f, 1.0f, 1.0f};
+    }
+
+    normal *= 1 / normal.z;
+    return Vector3f{1.0f - (normal.x + normal.y), normal.x, normal.y};
+}
+
+/*
+Original version of barycentric coordinates as found on the code of the book/wiki.
+The cross product is done as cross((AC.x, AB.x, PA.x), (AC.y, AB.y, PA.y))
+on the code, while the text uses cross((AB.x, AC.x, PA.x), (AB.y, AC.y, PA.y))
+This changes requires that the barycentric coordinates are expressed as (1 - u - v, v, u),
+instead of (1 - u - v, u, v), which is the formula given on the text.
+*/
+Vector3f tiny_barycentric_coordinates(const std::array<Vector2i, 3>& vertices, Vector2i point)
+{
+    Vector3f normal = cross(Vector3f{static_cast<float>(vertices[2].x - vertices[0].x), static_cast<float>(vertices[1].x - vertices[0].x), static_cast<float>(vertices[0].x - point.x)}, Vector3f{static_cast<float>(vertices[2].y - vertices[0].y), static_cast<float>(vertices[1].y - vertices[0].y), static_cast<float>(vertices[0].y - point.y)});
+    if (std::abs(normal.z) < 1) { return Vector3f{-1, 1, 1}; }
+    return Vector3f{1.0f - (normal.x+normal.y)/normal.z, normal.y/normal.z, normal.x/normal.z};
+}
+
+void compare_barycentric_coordinates()
+{
+    std::array<Vector2i, 3> triangle0{Vector2i{3, 2}, Vector2i{5, 3}, Vector2i{2, 4}};
+    std::cout << "My test: " << barycentric_coordinates(triangle0, Vector2i{4, 2}) << "\n";
+    std::cout << "Tiny code: " << tiny_barycentric_coordinates(triangle0, Vector2i{4, 2}) << "\n";
+}
+
+bool is_inside_triangle(const std::array<Vector2i, 3>& vertices, Vector2i point)
+{
+    Vector3f barycentric = barycentric_coordinates(vertices, point);
+    
+    if (barycentric.x < 0 || barycentric.y < 0 || barycentric.z < 0)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+void bounding_box_fill_triangle(Vector2i vertex0, Vector2i vertex1, Vector2i vertex2, TGAImage& image, const TGAColor& color)
+{
+    Vector2i min_bounding_box{image.get_width() - 1, image.get_height() - 1};
+    Vector2i max_bounding_box{0, 0};
+    Vector2i clamp{image.get_width() - 1, image.get_height() - 1};
+    const std::array<Vector2i, 3> vertices{vertex0, vertex1, vertex2};
+
+    for (int i = 0; i < vertices.size(); ++i)
+    {
+        min_bounding_box.x = std::max(0, std::min(min_bounding_box.x, vertices[i].x));
+        min_bounding_box.y = std::max(0, std::min(min_bounding_box.y, vertices[i].y));
+
+        max_bounding_box.x = std::min(clamp.x, std::max(max_bounding_box.x, vertices[i].x));
+        max_bounding_box.y = std::min(clamp.y, std::max(max_bounding_box.y, vertices[i].y));
+    }
+
+    Vector2i draw_point;
+    for (draw_point.x = min_bounding_box.x; draw_point.x <= max_bounding_box.x; ++draw_point.x)
+    {
+        for (draw_point.y = min_bounding_box.y; draw_point.y <= max_bounding_box.y; ++draw_point.y)
+        {
+            if (is_inside_triangle(vertices, draw_point))
+            {
+                image.set(draw_point.x, draw_point.y, color);
+            }
+        }
+    }
+}
+
 int main(int argc, char* argv[])
 {
     const int width = 200;
@@ -168,13 +248,17 @@ int main(int argc, char* argv[])
     const TGAColor red{255, 0, 0, 255};
     const TGAColor green{0, 255, 0, 255};
 
-    std::array<Vector2i, 3> triangle0{Vector2i{10, 70}, Vector2i{50, 160}, Vector2i{70, 80}};
+    /*std::array<Vector2i, 3> triangle0{Vector2i{10, 70}, Vector2i{50, 160}, Vector2i{70, 80}};
     std::array<Vector2i, 3> triangle1{Vector2i{180, 50}, Vector2i{150, 1}, Vector2i{70, 180}};
     std::array<Vector2i, 3> triangle2{Vector2i{180, 150}, Vector2i{120, 160}, Vector2i{130, 180}};
 
     line_sweeping_fill_triangle(triangle0[0], triangle0[1], triangle0[2], image, red);
     line_sweeping_fill_triangle(triangle1[0], triangle1[1], triangle1[2], image, white);
     line_sweeping_fill_triangle(triangle2[0], triangle2[1], triangle2[2], image, green);
+    bounding_box_fill_triangle(triangle0[0], triangle0[1], triangle0[2], image, red);
+    bounding_box_fill_triangle(triangle1[0], triangle1[1], triangle1[2], image, white);
+    bounding_box_fill_triangle(triangle2[0], triangle2[1], triangle2[2], image, green);*/
+    bounding_box_fill_triangle(Vector2i{10, 10}, Vector2i{100, 30}, Vector2i{190, 160}, image, red);
 
     image.flip_vertically();
     image.write_tga_file("output.tga");
