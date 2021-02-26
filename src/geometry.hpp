@@ -22,14 +22,14 @@ struct Vector2
         return *this;
     }
 
-    Vector2& operator*=(T scale)
+    Vector2& operator*=(double scale)
     {
-        x *= scale;
-        y *= scale;
+        x = static_cast<T>(scale * x);
+        y = static_cast<T>(scale * y);
         return *this;
     }
 
-    Vector2& operator/=(T scale)
+    Vector2& operator/=(double scale)
     {
         *this *= 1 / scale;
         return *this;
@@ -70,15 +70,15 @@ struct Vector3
         return *this;
     }
 
-    Vector3& operator*=(T scale)
+    Vector3& operator*=(double scale)
     {
-        x *= scale;
-        y *= scale;
-        z *= scale;
+        x = static_cast<T>(scale * x);
+        y = static_cast<T>(scale; * y);
+        z = static_cast<T>(scale * z);
         return *this;
     }
 
-    Vector3& operator/=(T scale)
+    Vector3& operator/=(double scale)
     {
         *this *= 1 / scale;
         return *this;
@@ -128,19 +128,19 @@ inline Vector2<T> operator*(const Vector2<T>& u, const Vector2<T>& v)
 }
 
 template<typename T>
-inline Vector2<T> operator*(T scale, const Vector2<T>& v)
+inline Vector2<T> operator*(double scale, const Vector2<T>& v)
 {
-    return Vector2<T>{scale * v.x, scale * v.y};
+    return Vector2<T>{static_cast<T>(scale * v.x), static_cast<T>(scale * v.y)};
 }
 
 template<typename T>
-inline Vector2<T> operator*(const Vector2<T>& v, T scale)
+inline Vector2<T> operator*(const Vector2<T>& v, double scale)
 {
     return scale * v;
 }
 
 template<typename T>
-inline Vector2<T> operator/(T scale, const Vector2<T>& v)
+inline Vector2<T> operator/(double scale, const Vector2<T>& v)
 {
     return (1 / scale) * v;
 }
@@ -196,19 +196,19 @@ inline Vector3<T> operator*(const Vector3<T>& u, const Vector3<T>& v)
 }
 
 template<typename T>
-inline Vector3<T> operator*(T scale, const Vector3<T>& v)
+inline Vector3<T> operator*(double scale, const Vector3<T>& v)
 {
-    return Vector3<T>{scale * v.x, scale * v.y, scale * v.z};
+    return Vector3<T>{static_cast<T>(scale * v.x), static_cast<T>(scale * v.y), static_cast<T>(scale * v.z)};
 }
 
 template<typename T>
-inline Vector3<T> operator*(const Vector3<T>& v, T scale)
+inline Vector3<T> operator*(const Vector3<T>& v, double scale)
 {
     return scale * v;
 }
 
 template<typename T>
-inline Vector3<T> operator/(T scale, const Vector3<T>& v)
+inline Vector3<T> operator/(double scale, const Vector3<T>& v)
 {
     return (1 / scale) * v;
 }
