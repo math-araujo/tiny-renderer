@@ -1,6 +1,7 @@
 #include "geometry.hpp"
 #include "model.hpp"
 #include "tgaimage.h"
+#include "util.hpp"
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -238,30 +239,73 @@ void bounding_box_fill_triangle(Vector2i vertex0, Vector2i vertex1, Vector2i ver
     }
 }
 
-int main(int argc, char* argv[])
+void draw_random_colored_wire_mesh(const std::string& filename)
 {
-    const int width = 200;
-    const int height = 200;
+    const Model model{filename};
+    const int width = 800;
+    const int height = 800;
     TGAImage image{width, height, TGAImage::RGB};
     
-    const TGAColor white{255, 255, 255, 255};
-    const TGAColor red{255, 0, 0, 255};
-    const TGAColor green{0, 255, 0, 255};
+    for (int i = 0; i < model.number_faces(); ++i)
+    {
+        const auto& face = model.face(i);
 
-    /*std::array<Vector2i, 3> triangle0{Vector2i{10, 70}, Vector2i{50, 160}, Vector2i{70, 80}};
-    std::array<Vector2i, 3> triangle1{Vector2i{180, 50}, Vector2i{150, 1}, Vector2i{70, 180}};
-    std::array<Vector2i, 3> triangle2{Vector2i{180, 150}, Vector2i{120, 160}, Vector2i{130, 180}};
+        std::array<Vector2i, 3> screen_coordinates;
+        for (int j = 0; j < 3; ++j)
+        {
+            Vector3f world_coordinates{model.vertex(face[j])};
+            screen_coordinates[j] = Vector2i{static_cast<int>((world_coordinates.x + 1.0f) * width / 2.0f), 
+                                             static_cast<int>((world_coordinates.y + 1.0f) * height / 2.0f)};
+        }
 
-    line_sweeping_fill_triangle(triangle0[0], triangle0[1], triangle0[2], image, red);
-    line_sweeping_fill_triangle(triangle1[0], triangle1[1], triangle1[2], image, white);
-    line_sweeping_fill_triangle(triangle2[0], triangle2[1], triangle2[2], image, green);
-    bounding_box_fill_triangle(triangle0[0], triangle0[1], triangle0[2], image, red);
-    bounding_box_fill_triangle(triangle1[0], triangle1[1], triangle1[2], image, white);
-    bounding_box_fill_triangle(triangle2[0], triangle2[1], triangle2[2], image, green);*/
-    bounding_box_fill_triangle(Vector2i{10, 10}, Vector2i{100, 30}, Vector2i{190, 160}, image, red);
+        bounding_box_fill_triangle(screen_coordinates[0], screen_coordinates[1], screen_coordinates[2], image, TGAColor{random_uchar(), random_uchar(), random_uchar(), 255});
+    }
 
-    image.flip_vertically();
+    image.flip_vertically(); // set origin to left bottom corner
     image.write_tga_file("output.tga");
+}
+
+void draw_back_face_culling_wire_mesh(const std::string& filename)
+{
+    const Model model{filename};
+    const int width = 800;
+    const int height = 800;
+    TGAImage image{width, height, TGAImage::RGB};
+    const Vector3f light_direction{0, 0, -1};
+
+    for (int i = 0; i < model.number_faces(); ++i)
+    {
+        const auto& face = model.face(i);
+
+        std::array<Vector3f, 3> world_coordinates;
+        std::array<Vector2i, 3> screen_coordinates;
+        for (int j = 0; j < 3; ++j)
+        {
+            Vector3f vertex{model.vertex(face[j])};
+            world_coordinates[j] = vertex;
+            screen_coordinates[j] = Vector2i{static_cast<int>((vertex.x + 1.0f) * width / 2.0f), 
+                                             static_cast<int>((vertex.y + 1.0f) * height / 2.0f)};
+        }
+
+        Vector3f normal = cross(world_coordinates[2] - world_coordinates[0], world_coordinates[1] - world_coordinates[0]);
+        normal.normalize();
+        double intensity = dot(normal, light_direction);
+        
+        if (intensity > 0)
+        {
+            auto color = static_cast<unsigned char>(intensity * 255);
+            bounding_box_fill_triangle(screen_coordinates[0], screen_coordinates[1], screen_coordinates[2],
+                                       image, TGAColor{color, color, color, 255});
+        }
+    }
+
+    image.flip_vertically(); // set origin to left bottom corner
+    image.write_tga_file("output.tga");
+}
+
+int main(int argc, char* argv[])
+{
+    draw_back_face_culling_wire_mesh("obj/african_head.obj");
 
     return 0;
 }
