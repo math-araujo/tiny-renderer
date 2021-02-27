@@ -4,6 +4,7 @@
 #include "util.hpp"
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 void draw_line(Vector2i start, Vector2i end, TGAImage& image, TGAColor color)
 {
@@ -154,29 +155,46 @@ void bounding_box_fill_triangle(Vector2i vertex0, Vector2i vertex1, Vector2i ver
     }
 }
 
-Vector3f barycentric_coordinates(const std::array<Vector2i, 3>& vertices, Vector2i point)
+void bounding_box_fill_triangle(Vector3f vertex0, Vector3f vertex1, Vector3f vertex2, std::vector<float>& depth_buffer, TGAImage& image, const TGAColor& color)
 {
-    Vector3f normal = cross(Vector3f{static_cast<float>(vertices[1].x - vertices[0].x),
-                                     static_cast<float>(vertices[2].x - vertices[0].x),
-                                     static_cast<float>(vertices[0].x - point.x)},
-                            Vector3f{static_cast<float>(vertices[1].y - vertices[0].y),
-                                     static_cast<float>(vertices[2].y - vertices[0].y),
-                                     static_cast<float>(vertices[0].y - point.y)});
-                                     
-    if (std::abs(normal.z) < 1.0f)
-    { 
-        return Vector3f{-1.0f, 1.0f, 1.0f};
+    Vector2f min_bounding_box{std::numeric_limits<float>::max(), std::numeric_limits<float>::max()};
+    Vector2f max_bounding_box{std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest()};
+    Vector2f clamp{static_cast<float>(image.get_width() - 1), static_cast<float>(image.get_height() - 1)};
+    const std::array<Vector3f, 3> vertices{vertex0, vertex1, vertex2};
+    
+    for (int i = 0; i < vertices.size(); ++i)
+    {
+        min_bounding_box.x = std::max(0.0f, std::min(min_bounding_box.x, vertices[i].x));
+        min_bounding_box.y = std::max(0.0f, std::min(min_bounding_box.y, vertices[i].y));
+
+        max_bounding_box.x = std::min(clamp.x, std::max(max_bounding_box.x, vertices[i].x));
+        max_bounding_box.y = std::min(clamp.y, std::max(max_bounding_box.y, vertices[i].y));
     }
+    
+    Vector3f draw_point;
+    
+    for (draw_point.x = min_bounding_box.x; draw_point.x <= max_bounding_box.x; ++draw_point.x)
+    {
+        for (draw_point.y = min_bounding_box.y; draw_point.y <= max_bounding_box.y; ++draw_point.y)
+        {
+            const auto barycentric = barycentric_coordinates(vertices, draw_point);
+            
+            if (barycentric.x < 0 || barycentric.y < 0 || barycentric.z < 0)
+            {
+                continue;
+            }
 
-    normal *= 1 / normal.z;
-    return Vector3f{1.0f - (normal.x + normal.y), normal.x, normal.y};
-}
+            draw_point.z = float(dot(barycentric, Vector3f{vertex0.z, vertex1.z, vertex2.z}));
 
-Vector3f tiny_barycentric_coordinates(const std::array<Vector2i, 3>& vertices, Vector2i point)
-{
-    Vector3f normal = cross(Vector3f{static_cast<float>(vertices[2].x - vertices[0].x), static_cast<float>(vertices[1].x - vertices[0].x), static_cast<float>(vertices[0].x - point.x)}, Vector3f{static_cast<float>(vertices[2].y - vertices[0].y), static_cast<float>(vertices[1].y - vertices[0].y), static_cast<float>(vertices[0].y - point.y)});
-    if (std::abs(normal.z) < 1) { return Vector3f{-1, 1, 1}; }
-    return Vector3f{1.0f - (normal.x+normal.y)/normal.z, normal.y/normal.z, normal.x/normal.z};
+            const int index = static_cast<int>(draw_point.x + draw_point.y * image.get_width());
+
+            if (depth_buffer[index] < draw_point.z)
+            {
+                depth_buffer[index] = draw_point.z;
+                image.set(static_cast<int>(draw_point.x), static_cast<int>(draw_point.y), color);
+            }
+        }
+    }
 }
 
 void debug_compare_barycentric_coordinates()

@@ -1,5 +1,4 @@
 #include "scenes.hpp"
-#include "geometry.hpp"
 #include "model.hpp"
 #include "rendering.hpp"
 #include "tgaimage.h"
@@ -7,6 +6,13 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <limits>
+#include <vector>
+
+Vector3f world_to_screen(Vector3f pos, int width, int height)
+{
+    return Vector3f{float(int((pos.x + 1.0f) * width / 2.0f + 0.5f)), float(int((pos.y + 1.0f) * height / 2.0f + 0.5f)), pos.z};
+}
 
 void draw_wire_mesh(const std::string& filename)
 {
@@ -102,4 +108,41 @@ void draw_back_face_culling_wire_mesh(const std::string& filename)
 
     image.flip_vertically(); // set origin to left bottom corner
     image.write_tga_file("output.tga");
+}
+
+void draw_depth_buffer(const std::string& filename)
+{
+    const Model model{filename};
+    const int width = 600;
+    const int height = 600;
+    TGAImage image{width, height, TGAImage::RGB};
+    const Vector3f light_direction{0, 0, -1};
+    std::vector<float> depth_buffer(width * height, std::numeric_limits<float>::lowest());
+
+    for (int i = 0; i < model.number_faces(); ++i)
+    {
+        const auto& face = model.face(i);
+
+        std::array<Vector3f, 3> world_coordinates;
+        std::array<Vector3f, 3> screen_coordinates;
+        for (int j = 0; j < 3; ++j)
+        {
+            world_coordinates[j] = model.vertex(face[j]);
+            screen_coordinates[j] = world_to_screen(world_coordinates[j], width, height);
+        }
+
+        Vector3f normal = cross(world_coordinates[2] - world_coordinates[0], world_coordinates[1] - world_coordinates[0]);
+        normal.normalize();
+        double intensity = dot(normal, light_direction);
+        
+        if (intensity > 0)
+        {
+            auto color = static_cast<unsigned char>(intensity * 255);
+            bounding_box_fill_triangle(screen_coordinates[0], screen_coordinates[1], screen_coordinates[2],
+                                        depth_buffer, image, TGAColor{color, color, color, 255});
+        }
+    }
+
+    image.flip_vertically(); // set origin to left bottom corner
+    image.write_tga_file("depth-buffer.tga");
 }
