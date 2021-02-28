@@ -2,8 +2,23 @@
 #define MODEL_HPP
 
 #include "geometry.hpp"
+#include "tgaimage.h"
 #include <string>
 #include <vector>
+
+/*
+In .obj format, each face element contain vertex, texture and normal indices (in this order)
+separated by slashes
+*/
+struct FaceElement
+{
+    int vertex_index{0};
+    int texture_index{0};
+    int normal_index{0};
+
+    FaceElement() {}
+    FaceElement(int vertex, int texture, int normal): vertex_index{vertex}, texture_index{texture}, normal_index{normal} {}
+};
 
 class Model
 {
@@ -13,11 +28,21 @@ public:
     int number_faces() const;
     Vector3f& vertex(int id);
     const Vector3f& vertex(int id) const;
-    std::vector<int>& face(int id);
-    const std::vector<int>& face(int id) const;
+    std::vector<int> face(int id) const;
+    std::vector<FaceElement>& face_element(int id);
+    const std::vector<FaceElement>& face_element(int id) const;
+    Vector2f uv(int face, int vertex);
+    Vector2f uv(int index);
+    TGAColor diffuse_map_at(Vector2f uv);
 private:
     std::vector<Vector3f> vertices_;
-    std::vector<std::vector<int>> faces_;
+    std::vector<std::vector<FaceElement>> faces_;
+    
+    // For texture coordinates
+    std::vector<Vector2f> uv_coordinates_;
+    TGAImage diffuse_map_;
 };
+
+void load_model_texture(std::string filename, std::string suffix, TGAImage& image);
 
 #endif // MODEL_HPP

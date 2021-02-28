@@ -11,14 +11,14 @@
 
 Vector3f world_to_screen(Vector3f pos, int width, int height)
 {
-    return Vector3f{float(int((pos.x + 1.0f) * width / 2.0f + 0.5f)), float(int((pos.y + 1.0f) * height / 2.0f + 0.5f)), pos.z};
+    return Vector3f{float(int((pos.x + 1.0f) * width / 2.0f + 0.5f)), float(int((pos.y + 1.0f) * height / 2.0f + 0.5f)), float(int((pos.z + 1.0) * 255 / 2.0f))};
 }
 
 void draw_wire_mesh(const std::string& filename)
 {
     const Model model{filename};
-    const int width = 800;
-    const int height = 800;
+    const int width = 600;
+    const int height = 600;
     TGAImage image{width, height, TGAImage::RGB};
     const TGAColor white{255, 255, 255, 255};
     const TGAColor red{255, 0, 0, 255};
@@ -43,14 +43,14 @@ void draw_wire_mesh(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    image.write_tga_file("output.tga");
+    image.write_tga_file("wire_mesh.tga");
 }
 
-void draw_random_colored_wire_mesh(const std::string& filename)
+void draw_random_colored_triangles(const std::string& filename)
 {
     const Model model{filename};
-    const int width = 800;
-    const int height = 800;
+    const int width = 600;
+    const int height = 600;
     TGAImage image{width, height, TGAImage::RGB};
     
     for (int i = 0; i < model.number_faces(); ++i)
@@ -69,14 +69,14 @@ void draw_random_colored_wire_mesh(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    image.write_tga_file("output.tga");
+    image.write_tga_file("colored_filled_triangle.tga");
 }
 
-void draw_back_face_culling_wire_mesh(const std::string& filename)
+void draw_back_face_culling(const std::string& filename)
 {
     const Model model{filename};
-    const int width = 800;
-    const int height = 800;
+    const int width = 600;
+    const int height = 600;
     TGAImage image{width, height, TGAImage::RGB};
     const Vector3f light_direction{0, 0, -1};
 
@@ -107,7 +107,7 @@ void draw_back_face_culling_wire_mesh(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    image.write_tga_file("output.tga");
+    image.write_tga_file("back_face_culling.tga");
 }
 
 void draw_depth_buffer(const std::string& filename)
@@ -144,5 +144,43 @@ void draw_depth_buffer(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    image.write_tga_file("depth-buffer.tga");
+    image.write_tga_file("depth_buffer.tga");
+}
+
+void draw_textured_depth_buffer(const std::string& filename)
+{
+    Model model{filename};
+    const int width = 600;
+    const int height = 600;
+    TGAImage image{width, height, TGAImage::RGB};
+    const Vector3f light_direction{0, 0, -1};
+    std::vector<float> depth_buffer(width * height, std::numeric_limits<float>::lowest());
+
+    for (int i = 0; i < model.number_faces(); ++i)
+    {
+        const auto& face = model.face(i);
+
+        std::array<Vector3f, 3> world_coordinates;
+        std::array<Vector3f, 3> screen_coordinates;
+        std::array<Vector2f, 3> uv_coordinates;
+        for (int j = 0; j < 3; ++j)
+        {
+            world_coordinates[j] = model.vertex(face[j]);
+            screen_coordinates[j] = world_to_screen(world_coordinates[j], width, height);
+            uv_coordinates[j] = model.uv(i, j);
+        }
+
+        Vector3f normal = cross(world_coordinates[2] - world_coordinates[0], world_coordinates[1] - world_coordinates[0]);
+        normal.normalize();
+        double intensity = dot(normal, light_direction);
+        
+        if (intensity > 0)
+        {
+            auto color = static_cast<unsigned char>(intensity * 255);
+            bounding_box_fill_triangle(screen_coordinates, uv_coordinates, model, depth_buffer, image);
+        }
+    }
+
+    image.flip_vertically(); // set origin to left bottom corner
+    image.write_tga_file("texture_depth_buffer.tga");   
 }

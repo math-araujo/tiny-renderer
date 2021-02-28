@@ -2,8 +2,17 @@
 
 int main(int argc, char* argv[])
 {
-    //draw_back_face_culling_wire_mesh("obj/african_head.obj");
-    draw_depth_buffer("obj/african_head.obj");
+    std::string filename{"obj/african_head.obj"};
+    if (argc == 2)
+    {
+        filename = argv[1];
+    }
+
+    draw_wire_mesh(filename);
+    draw_random_colored_triangles(filename);
+    draw_back_face_culling(filename);
+    draw_depth_buffer(filename);
+    draw_textured_depth_buffer(filename);
 
     return 0;
 }
