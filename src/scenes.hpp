@@ -1,7 +1,7 @@
 #ifndef SCENES_HPP
 #define SCENES_HPP
 
-#include "geometry.hpp"
+#include "vector.hpp"
 #include <string>
 
 Vector3f world_to_screen(Vector3f pos, int width, int heigth);

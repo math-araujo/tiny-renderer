@@ -1,8 +1,8 @@
 #ifndef MODEL_HPP
 #define MODEL_HPP
 
-#include "geometry.hpp"
 #include "tgaimage.h"
+#include "vector.hpp"
 #include <string>
 #include <vector>
 

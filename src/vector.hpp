@@ -1,5 +1,5 @@
-#ifndef GEOMETRY_HPP
-#define GEOMETRY_HPP
+#ifndef MATHEMATICAL_VECTOR_HPP
+#define MATHEMATICAL_VECTOR_HPP
 
 #include <cmath>
 #include <iostream>
@@ -14,7 +14,7 @@ struct Vector2
 
     Vector2() {}
     Vector2(T x, T y): x{x}, y{y} {}
-
+    
     Vector2& operator+=(const Vector2& v)
     {
         x += v.x;
@@ -263,4 +263,4 @@ inline Vector3<T> cross(const Vector3<T>& u, const Vector3<T>& v)
                     u.x * v.y - u.y * v.x};
 }
 
-#endif // GEOMETRY_HPP
+#endif // MATHEMATICAL_VECTOR

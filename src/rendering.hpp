@@ -1,8 +1,8 @@
 #ifndef RENDERING_HPP
 #define RENDERING_HPP
 
-#include "geometry.hpp"
 #include "tgaimage.h"
+#include "vector.hpp"
 #include <array>
 #include <vector>
 

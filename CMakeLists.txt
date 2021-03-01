@@ -7,7 +7,8 @@ add_executable(main
     src/main.cpp
     src/scenes.hpp src/scenes.cpp
     src/rendering.hpp src/rendering.cpp
-    src/geometry.hpp
+    src/matrix.hpp src/matrix.cpp
+    src/vector.hpp
     src/model.hpp src/model.cpp
     src/util.hpp
     )
