@@ -21,7 +21,7 @@ private:
 bool operator==(const Matrix& lhs, const Matrix& rhs);
 bool operator!=(const Matrix& lhs, const Matrix& rhs);
 Matrix operator*(const Matrix& lhs, const Matrix& rhs);
-std::ostream& operator<<(std::ostream& stream, Matrix& matrix);
+std::ostream& operator<<(std::ostream& stream, const Matrix& matrix);
 std::istream& operator>>(std::istream& stream, Matrix& matrix);
 
 Matrix identity(int dimensions);

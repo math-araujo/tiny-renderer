@@ -23,6 +23,8 @@ void bounding_box_fill_triangle(Vector3f vertex0, Vector3f vertex1, Vector3f ver
 // Draw a filled triangle using the Bounding Box algorithm and depth buffering using an image texture
 void bounding_box_fill_triangle(const std::array<Vector3f, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, Model& model, std::vector<float>& depth_buffer, TGAImage& image);
 
+void int_bounding_box_fill_triangle(const std::array<Vector3f, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, Model& model, std::vector<int>& depth_buffer, TGAImage& image);
+
 // Compute the barycentric coordinates of a point with respect to the triangle specified by the vertices
 template<typename T>
 Vector3f barycentric_coordinates(const std::array<Vector2<T>, 3>& vertices, Vector2<T> point)

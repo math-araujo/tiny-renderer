@@ -51,14 +51,15 @@ bool operator!=(const Matrix& lhs, const Matrix& rhs)
 Matrix operator*(const Matrix& lhs, const Matrix& rhs)
 {
     assert(lhs.number_columns() == rhs.number_rows());
-
     Matrix temp{lhs.number_rows(), rhs.number_columns()};
+    
     for (int i = 0; i < temp.number_rows(); ++i)
     {
-        for (int j = 0; temp.number_columns(); ++j)
+        for (int j = 0; j < temp.number_columns(); ++j)
         {
             for (int k = 0; k < lhs.number_columns(); ++k)
             {
+                int di = i + 1; int dj = j + 1; int dk = k + 1;
                 temp[i][j] += lhs[i][k] * rhs[k][j];
             }
         }
@@ -67,7 +68,7 @@ Matrix operator*(const Matrix& lhs, const Matrix& rhs)
     return temp;
 }
 
-std::ostream& operator<<(std::ostream& stream, Matrix& matrix)
+std::ostream& operator<<(std::ostream& stream, const Matrix& matrix)
 {
     for (int i = 0; i < matrix.number_rows(); ++i)
     {

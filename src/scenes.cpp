@@ -1,7 +1,9 @@
 #include "scenes.hpp"
+#include "matrix.hpp"
 #include "model.hpp"
 #include "rendering.hpp"
 #include "tgaimage.h"
+#include "transform.hpp"
 #include "util.hpp"
 #include <algorithm>
 #include <array>
@@ -43,7 +45,7 @@ void draw_wire_mesh(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    image.write_tga_file("wire_mesh.tga");
+    image.write_tga_file("1.wire_mesh.tga");
 }
 
 void draw_random_colored_triangles(const std::string& filename)
@@ -69,7 +71,7 @@ void draw_random_colored_triangles(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    image.write_tga_file("colored_filled_triangle.tga");
+    image.write_tga_file("2.colored_filled_triangle.tga");
 }
 
 void draw_back_face_culling(const std::string& filename)
@@ -107,7 +109,7 @@ void draw_back_face_culling(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    image.write_tga_file("back_face_culling.tga");
+    image.write_tga_file("3.back_face_culling.tga");
 }
 
 void draw_depth_buffer(const std::string& filename)
@@ -144,7 +146,7 @@ void draw_depth_buffer(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    image.write_tga_file("depth_buffer.tga");
+    image.write_tga_file("4.depth_buffer.tga");
 }
 
 void draw_textured_depth_buffer(const std::string& filename)
@@ -182,5 +184,53 @@ void draw_textured_depth_buffer(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    image.write_tga_file("texture_depth_buffer.tga");   
+    image.write_tga_file("5.texture_depth_buffer.tga");   
+}
+
+void draw_projective_perspective(const std::string& filename)
+{
+    Model model{filename};
+    const int width = 800;
+    const int height = 800;
+    const int depth = 255;
+    TGAImage image{width, height, TGAImage::RGB};
+    const Vector3f light_direction{0, 0, -1};
+    const Vector3f camera{0, 0, 3};
+    std::vector<float> depth_buffer(width * height, std::numeric_limits<float>::lowest());
+    
+    Matrix projection_matrix = identity(4);
+    projection_matrix[3][2] = -1.0f / camera.z;
+    //std::cout << "Projection matrix:\n" << projection_matrix << "\n";
+    const auto viewport_matrix = viewport(width / 8, height / 8, width * 3 / 4, height * 3 / 4, depth);
+    //std::cout << "Viewport matrix:\n" << viewport_matrix << "\n";
+    const auto projection_transform = viewport_matrix * projection_matrix;
+    //std::cout << "Projection transform:\n" << projection_transform << "\n";
+    
+    for (int i = 0; i < model.number_faces(); ++i)
+    {
+        const auto& face = model.face(i);
+
+        std::array<Vector3f, 3> world_coordinates;
+        std::array<Vector3f, 3> screen_coordinates;
+        std::array<Vector2f, 3> uv_coordinates;
+        for (int j = 0; j < 3; ++j)
+        {
+            world_coordinates[j] = model.vertex(face[j]);
+            screen_coordinates[j] = homogeneous_to_cartesian(projection_transform * cartesian_to_homogeneous(world_coordinates[j])); //world_to_screen(world_coordinates[j], width, height);
+            uv_coordinates[j] = model.uv(i, j);
+        }
+
+        Vector3f normal = cross(world_coordinates[2] - world_coordinates[0], world_coordinates[1] - world_coordinates[0]);
+        normal.normalize();
+        double intensity = dot(normal, light_direction);
+        
+        if (intensity > 0)
+        {
+            auto color = static_cast<unsigned char>(intensity * 255);
+            bounding_box_fill_triangle(screen_coordinates, uv_coordinates, model, depth_buffer, image);
+        }
+    }
+
+    image.flip_vertically(); // set origin to left bottom corner
+    image.write_tga_file("6.projective_perspective.tga"); 
 }

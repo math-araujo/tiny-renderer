@@ -21,4 +21,6 @@ void draw_depth_buffer(const std::string& filename);
 // Chapter 3 homework: add textures to draw_depth_buffer
 void draw_textured_depth_buffer(const std::string& filename);
 
+void draw_projective_perspective(const std::string& filename);
+
 #endif // SCENES_HPP

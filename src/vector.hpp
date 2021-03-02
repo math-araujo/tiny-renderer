@@ -109,6 +109,22 @@ using Vector3f = Vector3<float>;
 using Vector3d = Vector3<double>;
 using Vector3i = Vector3<int>;
 
+template<typename TTarget, typename TFrom>
+Vector2<TTarget> cast(const Vector2<TFrom>& vector)
+{
+    return Vector3<TTarget>{static_cast<TTarget>(vector.x), 
+                            static_cast<TTarget>(vector.y), 
+                            static_cast<TTarget>(vector.z)};
+}
+
+template<typename TTarget, typename TFrom>
+Vector3<TTarget> cast(const Vector3<TFrom>& vector)
+{
+    return Vector3<TTarget>{static_cast<TTarget>(vector.x), 
+                            static_cast<TTarget>(vector.y), 
+                            static_cast<TTarget>(vector.z)};
+}
+
 template<typename T>
 inline Vector2<T> operator+(const Vector2<T>& u, const Vector2<T>& v)
 {
