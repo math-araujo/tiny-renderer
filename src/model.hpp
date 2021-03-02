@@ -34,10 +34,13 @@ public:
     Vector2f uv(int face, int vertex);
     Vector2f uv(int index);
     TGAColor diffuse_map_at(Vector2f uv);
+    Vector3f normal(int face, int vertex);
+    Vector3f normal(int index);
 private:
     std::vector<Vector3f> vertices_;
     std::vector<std::vector<FaceElement>> faces_;
-    
+    std::vector<Vector3f> normal_vectors_;
+
     // For texture coordinates
     std::vector<Vector2f> uv_coordinates_;
     TGAImage diffuse_map_;

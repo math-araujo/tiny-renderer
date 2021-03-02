@@ -48,10 +48,18 @@ Model::Model(const std::string& filename)
                 stream >> uv;
                 uv_coordinates_.emplace_back(std::move(uv));
             }
+            else if (line.compare(0, 3, "vn ") == 0)
+            {
+                stream >> trash >> trash;
+                Vector3f normal;
+                stream >> normal;
+                normal_vectors_.emplace_back(std::move(normal));
+            }
         }
         
         std::cerr << "Vertices: " << vertices_.size() << " Faces: " << faces_.size() 
-                  << " Texture vertices: " << uv_coordinates_.size() << "\n";
+                  << " Texture vertices: " << uv_coordinates_.size()
+                  << " Normal vectors: " << normal_vectors_.size() << "\n";
         
         load_model_texture(filename, "_diffuse.tga", diffuse_map_);
     }
@@ -103,7 +111,6 @@ const std::vector<FaceElement>& Model::face_element(int id) const
 Vector2f Model::uv(int face, int vertex)
 {
     const auto index = faces_[face][vertex].texture_index;
-    //std::cerr << " index = " << index;
     return uv(index);
 }
 
@@ -117,6 +124,17 @@ TGAColor Model::diffuse_map_at(Vector2f uv)
     Vector2i uv_screen{static_cast<int>(uv.x * diffuse_map_.get_width()),
                        static_cast<int>(uv.y * diffuse_map_.get_height())};
     return diffuse_map_.get(uv_screen.x, uv_screen.y);
+}
+
+Vector3f Model::normal(int face, int vertex)
+{
+    const auto index = faces_[face][vertex].normal_index;
+    return normal(index);
+}
+
+Vector3f Model::normal(int index)
+{
+    return normal_vectors_[index];
 }
 
 void load_model_texture(std::string filename, std::string suffix, TGAImage& image)

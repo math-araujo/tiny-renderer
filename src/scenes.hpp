@@ -24,4 +24,7 @@ void draw_textured_depth_buffer(const std::string& filename);
 // Chapter 4: perspective projection
 void draw_perspective_projection(const std::string& filename);
 
+// Chapter 5: Gouraud shading
+void draw_gouraud_shading(const std::string& filename);
+
 #endif // SCENES_HPP
