@@ -4,7 +4,7 @@
 #include "vector.hpp"
 #include <string>
 
-Vector3f world_to_screen(Vector3f pos, int width, int heigth);
+Vector3i world_to_screen(Vector3f pos, int width, int heigth);
 
 // Chapter 1 final render: wire frame mesh
 void draw_wire_mesh(const std::string& filename);
@@ -21,6 +21,7 @@ void draw_depth_buffer(const std::string& filename);
 // Chapter 3 homework: add textures to draw_depth_buffer
 void draw_textured_depth_buffer(const std::string& filename);
 
-void draw_projective_perspective(const std::string& filename);
+// Chapter 4: perspective projection
+void draw_perspective_projection(const std::string& filename);
 
 #endif // SCENES_HPP

@@ -18,12 +18,10 @@ void line_sweeping_fill_triangle(Vector2i vertex0, Vector2i vertex1, Vector2i ve
 void bounding_box_fill_triangle(Vector2i vertex0, Vector2i vertex1, Vector2i vertex2, TGAImage& image, const TGAColor& color);
 
 // Draw a filled triangle using the Bounding Box algorithm and depth buffering using the provided color
-void bounding_box_fill_triangle(Vector3f vertex0, Vector3f vertex1, Vector3f vertex2, std::vector<float>& depth_buffer, TGAImage& image, const TGAColor& color);
+void bounding_box_fill_triangle(Vector3i vertex0, Vector3i vertex1, Vector3i vertex2, std::vector<float>& depth_buffer, TGAImage& image, const TGAColor& color);
 
 // Draw a filled triangle using the Bounding Box algorithm and depth buffering using an image texture
-void bounding_box_fill_triangle(const std::array<Vector3f, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, Model& model, std::vector<float>& depth_buffer, TGAImage& image);
-
-void int_bounding_box_fill_triangle(const std::array<Vector3f, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, Model& model, std::vector<int>& depth_buffer, TGAImage& image);
+void bounding_box_fill_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, Model& model, std::vector<float>& depth_buffer, TGAImage& image);
 
 // Compute the barycentric coordinates of a point with respect to the triangle specified by the vertices
 template<typename T>

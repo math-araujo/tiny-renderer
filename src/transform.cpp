@@ -29,3 +29,10 @@ Matrix viewport(int x, int y, int width, int heigth, int depth)
 
     return matrix;
 }
+
+Matrix projection(float eye)
+{
+    Matrix projection_matrix = identity(4);
+    projection_matrix[3][2] = -1.0f / eye;
+    return projection_matrix;
+}

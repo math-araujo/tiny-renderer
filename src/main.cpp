@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
     draw_back_face_culling(filename);
     draw_depth_buffer(filename);
     draw_textured_depth_buffer(filename);
-    draw_projective_perspective(filename);
+    draw_perspective_projection(filename);
 
     return 0;
 }

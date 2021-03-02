@@ -155,23 +155,23 @@ void bounding_box_fill_triangle(Vector2i vertex0, Vector2i vertex1, Vector2i ver
     }
 }
 
-void bounding_box_fill_triangle(Vector3f vertex0, Vector3f vertex1, Vector3f vertex2, std::vector<float>& depth_buffer, TGAImage& image, const TGAColor& color)
+void bounding_box_fill_triangle(Vector3i vertex0, Vector3i vertex1, Vector3i vertex2, std::vector<float>& depth_buffer, TGAImage& image, const TGAColor& color)
 {
-    Vector2f min_bounding_box{std::numeric_limits<float>::max(), std::numeric_limits<float>::max()};
-    Vector2f max_bounding_box{std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest()};
-    Vector2f clamp{static_cast<float>(image.get_width() - 1), static_cast<float>(image.get_height() - 1)};
-    const std::array<Vector3f, 3> vertices{vertex0, vertex1, vertex2};
+    Vector2i min_bounding_box{std::numeric_limits<int>::max(), std::numeric_limits<int>::max()};
+    Vector2i max_bounding_box{std::numeric_limits<int>::min(), std::numeric_limits<int>::min()};
+    Vector2i clamp{image.get_width() - 1, image.get_height() - 1};
+    const std::array<Vector3i, 3> vertices{vertex0, vertex1, vertex2};
     
     for (int i = 0; i < vertices.size(); ++i)
     {
-        min_bounding_box.x = std::max(0.0f, std::min(min_bounding_box.x, vertices[i].x));
-        min_bounding_box.y = std::max(0.0f, std::min(min_bounding_box.y, vertices[i].y));
+        min_bounding_box.x = std::max(0, std::min(min_bounding_box.x, vertices[i].x));
+        min_bounding_box.y = std::max(0, std::min(min_bounding_box.y, vertices[i].y));
 
         max_bounding_box.x = std::min(clamp.x, std::max(max_bounding_box.x, vertices[i].x));
         max_bounding_box.y = std::min(clamp.y, std::max(max_bounding_box.y, vertices[i].y));
     }
     
-    Vector3f draw_point;
+    Vector3i draw_point;
     
     for (draw_point.x = min_bounding_box.x; draw_point.x <= max_bounding_box.x; ++draw_point.x)
     {
@@ -184,36 +184,35 @@ void bounding_box_fill_triangle(Vector3f vertex0, Vector3f vertex1, Vector3f ver
                 continue;
             }
 
-            draw_point.z = float(dot(barycentric, Vector3f{vertex0.z, vertex1.z, vertex2.z}));
+            auto z_coord = float(dot(barycentric, cast<float>(Vector3i{vertex0.z, vertex1.z, vertex2.z})));
 
             const int index = static_cast<int>(draw_point.x + draw_point.y * image.get_width());
             
-            if (depth_buffer[index] < draw_point.z)
+            if (depth_buffer[index] < z_coord)
             {
-                depth_buffer[index] = draw_point.z;
-                image.set(static_cast<int>(draw_point.x), static_cast<int>(draw_point.y), color);
+                depth_buffer[index] = z_coord;
+                image.set(draw_point.x, draw_point.y, color);
             }
         }
     }
 }
 
-void bounding_box_fill_triangle(const std::array<Vector3f, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, Model& model, std::vector<float>& depth_buffer, TGAImage& image)
+void bounding_box_fill_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, Model& model, std::vector<float>& depth_buffer, TGAImage& image)
 {
-    Vector2f min_bounding_box{std::numeric_limits<float>::max(), std::numeric_limits<float>::max()};
-    Vector2f max_bounding_box{std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest()};
-    Vector2f clamp{static_cast<float>(image.get_width() - 1), static_cast<float>(image.get_height() - 1)};
+    Vector2i min_bounding_box{std::numeric_limits<int>::max(), std::numeric_limits<int>::max()};
+    Vector2i max_bounding_box{std::numeric_limits<int>::min(), std::numeric_limits<int>::min()};
+    Vector2i clamp{image.get_width() - 1, image.get_height() - 1};
     
     for (int i = 0; i < vertices.size(); ++i)
     {
-        min_bounding_box.x = std::max(0.0f, std::min(min_bounding_box.x, vertices[i].x));
-        min_bounding_box.y = std::max(0.0f, std::min(min_bounding_box.y, vertices[i].y));
+        min_bounding_box.x = std::max(0, std::min(min_bounding_box.x, vertices[i].x));
+        min_bounding_box.y = std::max(0, std::min(min_bounding_box.y, vertices[i].y));
 
         max_bounding_box.x = std::min(clamp.x, std::max(max_bounding_box.x, vertices[i].x));
         max_bounding_box.y = std::min(clamp.y, std::max(max_bounding_box.y, vertices[i].y));
     }
-    
-    /*Vector3f draw_point;
-    
+
+    Vector3i draw_point;
     for (draw_point.x = min_bounding_box.x; draw_point.x <= max_bounding_box.x; ++draw_point.x)
     {
         for (draw_point.y = min_bounding_box.y; draw_point.y <= max_bounding_box.y; ++draw_point.y)
@@ -225,38 +224,7 @@ void bounding_box_fill_triangle(const std::array<Vector3f, 3>& vertices, const s
                 continue;
             }
 
-            draw_point.z = float(dot(barycentric, Vector3f{vertices[0].z, vertices[1].z, vertices[2].z}));
-            const int index = static_cast<int>(draw_point.x + draw_point.y * image.get_width());
-            
-            if (depth_buffer[index] < draw_point.z)
-            {
-                // texture.x = textures[0].x * bc.x + textures[1].x * bc.y + textures[2].x * bc.z;
-                // texture.y = textures[0].y * bc.x + textures[0].y * bc.y + textures[2].y * bc.z;
-                const auto texture_u = dot(Vector3{uv_coordinates[0].x, uv_coordinates[1].x, uv_coordinates[2].x}, barycentric);
-                const auto texture_v = dot(Vector3{uv_coordinates[0].y, uv_coordinates[1].y, uv_coordinates[2].y}, barycentric);
-                const Vector2f texture{static_cast<float>(texture_u), static_cast<float>(texture_v)};
-                TGAColor color = model.diffuse_map_at(texture);
-                depth_buffer[index] = draw_point.z;
-                image.set(static_cast<int>(draw_point.x), static_cast<int>(draw_point.y), color);
-            }
-        }
-    }*/
-    Vector3i draw_point;
-    for (draw_point.x = static_cast<int>(min_bounding_box.x); draw_point.x <= static_cast<int>(max_bounding_box.x); ++draw_point.x)
-    {
-        for (draw_point.y = static_cast<int>(min_bounding_box.y); draw_point.y <= static_cast<int>(max_bounding_box.y); ++draw_point.y)
-        {
-            Vector3f float_draw_point{static_cast<float>(draw_point.x), static_cast<float>(draw_point.y), static_cast<float>(draw_point.z)};
-
-            const auto barycentric = barycentric_coordinates(vertices, float_draw_point);
-            
-            if (barycentric.x < 0 || barycentric.y < 0 || barycentric.z < 0)
-            {
-                continue;
-            }
-
-            draw_point.z = std::min(255, int(dot(barycentric, Vector3f{vertices[0].z, vertices[1].z, vertices[2].z})));
-            draw_point.z = std::max(0, draw_point.z);
+            auto z_coord = float(dot(barycentric, cast<float>(Vector3i{vertices[0].z, vertices[1].z, vertices[2].z})));
 
             const int index = static_cast<int>(draw_point.x + draw_point.y * image.get_width());
             
@@ -269,52 +237,6 @@ void bounding_box_fill_triangle(const std::array<Vector3f, 3>& vertices, const s
                 const Vector2f texture{static_cast<float>(texture_u), static_cast<float>(texture_v)};
                 TGAColor color = model.diffuse_map_at(texture);
                 depth_buffer[index] = static_cast<float>(draw_point.z);
-                image.set(static_cast<int>(draw_point.x), static_cast<int>(draw_point.y), color);
-            }
-        }
-    }
-}
-
-void int_bounding_box_fill_triangle(const std::array<Vector3f, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, Model& model, std::vector<int>& depth_buffer, TGAImage& image)
-{
-    Vector2f min_bounding_box{std::numeric_limits<float>::max(), std::numeric_limits<float>::max()};
-    Vector2f max_bounding_box{std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest()};
-    Vector2f clamp{static_cast<float>(image.get_width() - 1), static_cast<float>(image.get_height() - 1)};
-    
-    for (int i = 0; i < vertices.size(); ++i)
-    {
-        min_bounding_box.x = std::max(0.0f, std::min(min_bounding_box.x, vertices[i].x));
-        min_bounding_box.y = std::max(0.0f, std::min(min_bounding_box.y, vertices[i].y));
-
-        max_bounding_box.x = std::min(clamp.x, std::max(max_bounding_box.x, vertices[i].x));
-        max_bounding_box.y = std::min(clamp.y, std::max(max_bounding_box.y, vertices[i].y));
-    }
-    
-    Vector3f draw_point;
-    
-    for (draw_point.x = min_bounding_box.x; draw_point.x <= max_bounding_box.x; ++draw_point.x)
-    {
-        for (draw_point.y = min_bounding_box.y; draw_point.y <= max_bounding_box.y; ++draw_point.y)
-        {
-            const auto barycentric = barycentric_coordinates(vertices, draw_point);
-            
-            if (barycentric.x < 0 || barycentric.y < 0 || barycentric.z < 0)
-            {
-                continue;
-            }
-
-            draw_point.z = float(dot(barycentric, Vector3f{vertices[0].z, vertices[1].z, vertices[2].z}));
-            const int index = static_cast<int>(draw_point.x + draw_point.y * image.get_width());
-            
-            if (depth_buffer[index] < draw_point.z)
-            {
-                // texture.x = textures[0].x * bc.x + textures[1].x * bc.y + textures[2].x * bc.z;
-                // texture.y = textures[0].y * bc.x + textures[0].y * bc.y + textures[2].y * bc.z;
-                const auto texture_u = dot(Vector3{uv_coordinates[0].x, uv_coordinates[1].x, uv_coordinates[2].x}, barycentric);
-                const auto texture_v = dot(Vector3{uv_coordinates[0].y, uv_coordinates[1].y, uv_coordinates[2].y}, barycentric);
-                const Vector2f texture{static_cast<float>(texture_u), static_cast<float>(texture_v)};
-                TGAColor color = model.diffuse_map_at(texture);
-                depth_buffer[index] = int(draw_point.z);
                 image.set(static_cast<int>(draw_point.x), static_cast<int>(draw_point.y), color);
             }
         }

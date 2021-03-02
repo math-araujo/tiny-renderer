@@ -11,9 +11,9 @@
 #include <limits>
 #include <vector>
 
-Vector3f world_to_screen(Vector3f pos, int width, int height)
+Vector3i world_to_screen(Vector3f pos, int width, int height)
 {
-    return Vector3f{float(int((pos.x + 1.0f) * width / 2.0f + 0.5f)), float(int((pos.y + 1.0f) * height / 2.0f + 0.5f)), float(int((pos.z + 1.0) * 255 / 2.0f))};
+    return Vector3i{int((pos.x + 1.0f) * width / 2.0f), int((pos.y + 1.0f) * height / 2.0f), int((pos.z + 1.0) * 255 / 2.0f)};
 }
 
 void draw_wire_mesh(const std::string& filename)
@@ -126,7 +126,7 @@ void draw_depth_buffer(const std::string& filename)
         const auto& face = model.face(i);
 
         std::array<Vector3f, 3> world_coordinates;
-        std::array<Vector3f, 3> screen_coordinates;
+        std::array<Vector3i, 3> screen_coordinates;
         for (int j = 0; j < 3; ++j)
         {
             world_coordinates[j] = model.vertex(face[j]);
@@ -163,7 +163,7 @@ void draw_textured_depth_buffer(const std::string& filename)
         const auto& face = model.face(i);
 
         std::array<Vector3f, 3> world_coordinates;
-        std::array<Vector3f, 3> screen_coordinates;
+        std::array<Vector3i, 3> screen_coordinates;
         std::array<Vector2f, 3> uv_coordinates;
         for (int j = 0; j < 3; ++j)
         {
@@ -187,19 +187,18 @@ void draw_textured_depth_buffer(const std::string& filename)
     image.write_tga_file("5.texture_depth_buffer.tga");   
 }
 
-void draw_projective_perspective(const std::string& filename)
+void draw_perspective_projection(const std::string& filename)
 {
     Model model{filename};
-    const int width = 800;
-    const int height = 800;
+    const int width = 600;
+    const int height = 600;
     const int depth = 255;
     TGAImage image{width, height, TGAImage::RGB};
     const Vector3f light_direction{0, 0, -1};
     const Vector3f camera{0, 0, 3};
     std::vector<float> depth_buffer(width * height, std::numeric_limits<float>::lowest());
     
-    Matrix projection_matrix = identity(4);
-    projection_matrix[3][2] = -1.0f / camera.z;
+    Matrix projection_matrix = projection(camera.z);
     //std::cout << "Projection matrix:\n" << projection_matrix << "\n";
     const auto viewport_matrix = viewport(width / 8, height / 8, width * 3 / 4, height * 3 / 4, depth);
     //std::cout << "Viewport matrix:\n" << viewport_matrix << "\n";
@@ -211,12 +210,12 @@ void draw_projective_perspective(const std::string& filename)
         const auto& face = model.face(i);
 
         std::array<Vector3f, 3> world_coordinates;
-        std::array<Vector3f, 3> screen_coordinates;
+        std::array<Vector3i, 3> screen_coordinates;
         std::array<Vector2f, 3> uv_coordinates;
         for (int j = 0; j < 3; ++j)
         {
             world_coordinates[j] = model.vertex(face[j]);
-            screen_coordinates[j] = homogeneous_to_cartesian(projection_transform * cartesian_to_homogeneous(world_coordinates[j])); //world_to_screen(world_coordinates[j], width, height);
+            screen_coordinates[j] = cast<int>(homogeneous_to_cartesian(projection_transform * cartesian_to_homogeneous(world_coordinates[j]))); //world_to_screen(world_coordinates[j], width, height);
             uv_coordinates[j] = model.uv(i, j);
         }
 
