@@ -6,6 +6,7 @@ add_subdirectory(external)
 add_executable(main
     src/main.cpp
     src/scenes.hpp src/scenes.cpp
+    src/geometry.hpp src/geometry.cpp
     src/rendering.hpp src/rendering.cpp
     src/transform.hpp src/transform.cpp
     src/matrix.hpp src/matrix.cpp
