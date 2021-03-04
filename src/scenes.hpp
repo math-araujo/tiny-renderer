@@ -27,4 +27,7 @@ void draw_perspective_projection(const std::string& filename);
 // Chapter 5: Gouraud shading
 void draw_gouraud_shading(const std::string& filename);
 
+// Chapter 5: perspective projection with camera transformation
+void draw_look_at(const std::string& filename);
+
 #endif // SCENES_HPP

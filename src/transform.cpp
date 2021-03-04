@@ -36,3 +36,17 @@ Matrix projection(float eye)
     projection_matrix[3][2] = -1.0f / eye;
     return projection_matrix;
 }
+
+Matrix look_at(const Vector3f& eye, const Vector3f& center, const Vector3f& view_up)
+{
+    // Right hand coordinate system
+    const auto w = unit_vector(eye - center); // look from eye to center
+    const auto u = unit_vector(cross(view_up, w));
+    const auto v = cross(w, u);
+    
+    // Camera_rotation^-1 * Camera_transle^-1
+    return Matrix{{ {u.x, u.y, u.z, float(-dot(u, eye))},
+                    {v.x, v.y, v.z, float(-dot(v, eye))},
+                    {w.x, w.y, w.z, float(-dot(w, eye))},
+                    {0, 0, 0, 1} }};
+}

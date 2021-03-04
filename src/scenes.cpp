@@ -178,7 +178,6 @@ void draw_textured_depth_buffer(const std::string& filename)
         
         if (intensity > 0)
         {
-            auto color = static_cast<unsigned char>(intensity * 255);
             bounding_box_fill_triangle(screen_coordinates, uv_coordinates, model, depth_buffer, image);
         }
     }
@@ -225,7 +224,6 @@ void draw_perspective_projection(const std::string& filename)
         
         if (intensity > 0)
         {
-            auto color = static_cast<unsigned char>(intensity * 255);
             bounding_box_fill_triangle(screen_coordinates, uv_coordinates, model, depth_buffer, image);
         }
     }
@@ -272,11 +270,59 @@ void draw_gouraud_shading(const std::string& filename)
         
         if (intensity > 0)
         {
-            auto color = static_cast<unsigned char>(intensity * 255);
             fill_triangle_gouraud(screen_coordinates, intensities, depth_buffer, image);
         }
     }
 
     image.flip_vertically(); // set origin to left bottom corner
     image.write_tga_file("7.perspective_gouraud_shading.tga"); 
+}
+
+void draw_look_at(const std::string& filename)
+{
+    Model model{filename};
+    const int width = 600;
+    const int height = 600;
+    const int depth = 255;
+    TGAImage image{width, height, TGAImage::RGB};
+    const Vector3f light_direction{0, 0, -1};
+    const Vector3f camera{1, 1, 3};
+    const Vector3f center{0, 0, 0};
+    std::vector<float> depth_buffer(width * height, std::numeric_limits<float>::lowest());
+    
+    Matrix view_matrix = look_at(camera, center, Vector3f{0, 1, 0});
+    //std::cerr << "View matrix:\n" << view_matrix << "\n";
+    Matrix projection_matrix = projection(float((camera - center).length()));
+    //std::cerr << "Projection matrix:\n" << projection_matrix << "\n";
+    const auto viewport_matrix = viewport(width / 8, height / 8, width * 3 / 4, height * 3 / 4, depth);
+    //std::cerr << "Viewport matrix:\n" << viewport_matrix << "\n";
+    const auto scene_transform = viewport_matrix * projection_matrix * view_matrix;
+    //std::cerr << "Final transform:\n" << scene_transform << "\n";
+    
+    for (int i = 0; i < model.number_faces(); ++i)
+    {
+        const auto& face = model.face(i);
+
+        std::array<Vector3f, 3> world_coordinates;
+        std::array<Vector3i, 3> screen_coordinates;
+        std::array<Vector2f, 3> uv_coordinates;
+        for (int j = 0; j < 3; ++j)
+        {
+            world_coordinates[j] = model.vertex(face[j]);
+            screen_coordinates[j] = cast<int>(homogeneous_to_cartesian(scene_transform * cartesian_to_homogeneous(world_coordinates[j]))); 
+            uv_coordinates[j] = model.uv(i, j);
+        }
+
+        Vector3f normal = cross(world_coordinates[2] - world_coordinates[0], world_coordinates[1] - world_coordinates[0]);
+        normal.normalize();
+        double intensity = dot(normal, light_direction);
+        
+        if (intensity > 0)
+        {
+            bounding_box_fill_triangle(screen_coordinates, uv_coordinates, intensity, model, depth_buffer, image);
+        }
+    }
+
+    image.flip_vertically(); // set origin to left bottom corner
+    image.write_tga_file("8.look_at.tga"); 
 }

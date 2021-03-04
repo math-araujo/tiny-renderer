@@ -156,7 +156,7 @@ inline Vector2<T> operator*(const Vector2<T>& v, double scale)
 }
 
 template<typename T>
-inline Vector2<T> operator/(double scale, const Vector2<T>& v)
+inline Vector2<T> operator/(const Vector2<T>& v, double scale)
 {
     return (1 / scale) * v;
 }
@@ -230,7 +230,7 @@ inline Vector3<T> operator*(const Vector3<T>& v, double scale)
 }
 
 template<typename T>
-inline Vector3<T> operator/(double scale, const Vector3<T>& v)
+inline Vector3<T> operator/(const Vector3<T>& v, double scale)
 {
     return (1 / scale) * v;
 }

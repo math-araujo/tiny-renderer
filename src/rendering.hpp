@@ -23,86 +23,73 @@ void bounding_box_fill_triangle(Vector3i vertex0, Vector3i vertex1, Vector3i ver
 // Draw a filled triangle using the Bounding Box algorithm and depth buffering using an image texture
 void bounding_box_fill_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, Model& model, std::vector<float>& depth_buffer, TGAImage& image);
 
+// Draw a filled triangle using the Bounding Box algorithm and depth buffering using an image texture
+void bounding_box_fill_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, float light_intensity, Model& model, std::vector<float>& depth_buffer, TGAImage& image);
+
 void fill_triangle_gouraud(const std::array<Vector3i, 3>& vertices, const std::array<float, 3>& intensities, std::vector<float>& depth_buffer, TGAImage& image);
 
 // Compute the barycentric coordinates of a point with respect to the triangle specified by the vertices
 template<typename T>
 Vector3f barycentric_coordinates(const std::array<Vector2<T>, 3>& vertices, Vector2<T> point)
 {
-    Vector3f normal = cross(Vector3f{static_cast<float>(vertices[1].x - vertices[0].x),
-                                     static_cast<float>(vertices[2].x - vertices[0].x),
-                                     static_cast<float>(vertices[0].x - point.x)},
-                            Vector3f{static_cast<float>(vertices[1].y - vertices[0].y),
-                                     static_cast<float>(vertices[2].y - vertices[0].y),
-                                     static_cast<float>(vertices[0].y - point.y)});
+    auto normal = cross(Vector3<T>{vertices[1].x - vertices[0].x, vertices[2].x - vertices[0].x, vertices[0].x - point.x},
+                        Vector3<T>{vertices[1].y - vertices[0].y, vertices[2].y - vertices[0].y, vertices[0].y - point.y});
                                      
-    if (std::abs(normal.z) < 1.0f)
+    if (std::abs(static_cast<float>(normal.z)) <= std::numeric_limits<float>::epsilon())
     { 
         return Vector3f{-1.0f, 1.0f, 1.0f};
     }
 
-    normal *= 1 / normal.z;
-    return Vector3f{1.0f - static_cast<float>(normal.x + normal.y), static_cast<float>(normal.x), static_cast<float>(normal.y)};
+    auto normal_z = static_cast<float>(normal.z);
+    return Vector3f{1 - (normal.x + normal.y) / normal_z, normal.x / normal_z, normal.y / normal_z };   
 }
 
 // Compute the barycentric coordinates of a point with respect to a triangle whose vertices are A, B, C
 template<typename T>
 Vector3f barycentric_coordinates(Vector2<T> A, Vector2f B, Vector2f C, Vector3f point)
 {
-    Vector3f normal = cross(Vector3f{static_cast<float>(B.x - A.x),
-                                     static_cast<float>(C.x - A.x),
-                                     static_cast<float>(A.x - point.x)},
-                            Vector3f{static_cast<float>(B.y - A.y),
-                                     static_cast<float>(C.y - A.y),
-                                     static_cast<float>(A.y - point.y)});
+    auto normal = cross(Vector3<T>{B.x - A.x, C.x - A.x, A.x - point.x},
+                        Vector3<T>{B.y - A.y, C.y - A.y, A.y - point.y});
                                      
-    if (std::abs(normal.z) < 1.0f)
+    if (std::abs(static_cast<float>(normal.z)) <= std::numeric_limits<float>::epsilon())
     { 
         return Vector3f{-1.0f, 1.0f, 1.0f};
     }
 
-    normal *= 1 / normal.z;
-    return Vector3f{1.0f - static_cast<float>(normal.x + normal.y), static_cast<float>(normal.x), static_cast<float>(normal.y)};
+    auto normal_z = static_cast<float>(normal.z);
+    return Vector3f{1 - (normal.x + normal.y) / normal_z, normal.x / normal_z, normal.y / normal_z };
 }
 
 // Compute the barycentric coordinates of a point with respect to the triangle specified by the vertices
 template<typename T>
 Vector3f barycentric_coordinates(const std::array<Vector3<T>, 3>& vertices, Vector3<T> point)
 {
-    Vector3f normal = cross(Vector3f{static_cast<float>(vertices[1].x - vertices[0].x),
-                                     static_cast<float>(vertices[2].x - vertices[0].x),
-                                     static_cast<float>(vertices[0].x - point.x)},
-                            Vector3f{static_cast<float>(vertices[1].y - vertices[0].y),
-                                     static_cast<float>(vertices[2].y - vertices[0].y),
-                                     static_cast<float>(vertices[0].y - point.y)});
+    auto normal = cross(Vector3<T>{vertices[1].x - vertices[0].x, vertices[2].x - vertices[0].x, vertices[0].x - point.x},
+                        Vector3<T>{vertices[1].y - vertices[0].y, vertices[2].y - vertices[0].y, vertices[0].y - point.y});                                   
                                      
-    if (std::abs(normal.z) < 1.0f)
+    if (std::abs(static_cast<float>(normal.z)) <= std::numeric_limits<float>::epsilon())
     { 
         return Vector3f{-1.0f, 1.0f, 1.0f};
     }
 
-    normal *= 1 / normal.z;
-    return Vector3f{1.0f - static_cast<float>(normal.x + normal.y), static_cast<float>(normal.x), static_cast<float>(normal.y)};
+    auto normal_z = static_cast<float>(normal.z);
+    return Vector3f{1 - (normal.x + normal.y) / normal_z, normal.x / normal_z, normal.y / normal_z };
 }
 
 // Compute the barycentric coordinates of a point with respect to a triangle whose vertices are A, B, C
 template<typename T>
 Vector3f barycentric_coordinates(Vector3<T> A, Vector3f B, Vector3f C, Vector3f point)
 {
-    Vector3f normal = cross(Vector3f{static_cast<float>(B.x - A.x),
-                                     static_cast<float>(C.x - A.x),
-                                     static_cast<float>(A.x - point.x)},
-                            Vector3f{static_cast<float>(B.y - A.y),
-                                     static_cast<float>(C.y - A.y),
-                                     static_cast<float>(A.y - point.y)});
+    auto normal = cross(Vector3<T>{B.x - A.x, C.x - A.x, A.x - point.x},
+                        Vector3<T>{B.y - A.y, C.y - A.y, A.y - point.y});
                                      
-    if (std::abs(normal.z) < 1.0f)
+    if (std::abs(static_cast<float>(normal.z)) <= std::numeric_limits<float>::epsilon())
     { 
         return Vector3f{-1.0f, 1.0f, 1.0f};
     }
 
-    normal *= 1 / normal.z;
-    return Vector3f{1.0f - static_cast<float>(normal.x + normal.y), static_cast<float>(normal.x), static_cast<float>(normal.y)};
+    auto normal_z = static_cast<float>(normal.z);
+    return Vector3f{1 - (normal.x + normal.y) / normal_z, normal.x / normal_z, normal.y / normal_z };
 }
 
 /*
@@ -127,7 +114,6 @@ Vector3f tiny_barycentric_coordinates(const std::array<Vector3<T>, 3>& vertices,
     if (std::abs(normal.z) < 1) { return Vector3f{-1, 1, 1}; }
     return Vector3f{1.0f - (normal.x+normal.y)/normal.z, normal.y/normal.z, normal.x/normal.z};
 }
-
 
 // Test function to compare barycentric_coordinates and tiny_barycentric_coordinates
 void debug_compare_barycentric_coordinates();

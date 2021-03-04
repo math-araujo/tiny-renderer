@@ -8,6 +8,7 @@ class Matrix
 {
 public:
     Matrix(int number_rows = 4, int number_columns = 4);
+    explicit Matrix(std::vector<std::vector<float>>&& initializer);
     inline int number_rows() const;
     inline int number_columns() const;
     std::vector<float>& operator[](int i);

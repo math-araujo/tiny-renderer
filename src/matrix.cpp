@@ -5,6 +5,10 @@ Matrix::Matrix(int number_rows, int number_columns):
     data{std::vector<std::vector<float>>(number_rows, std::vector<float>(number_columns, 0.0f))}, rows{number_rows}, columns{number_columns}
 {}
 
+Matrix::Matrix(std::vector<std::vector<float>>&& initializer): 
+    data{initializer}, rows{static_cast<int>(data.size())}, columns{static_cast<int>(data.back().size())}
+{}
+
 int Matrix::number_rows() const
 {
     return rows;
