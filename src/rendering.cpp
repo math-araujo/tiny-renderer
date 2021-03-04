@@ -127,7 +127,7 @@ void line_sweeping_fill_triangle(Vector2i vertex0, Vector2i vertex1, Vector2i ve
     }
 }
 
-void bounding_box_fill_triangle(Vector2i vertex0, Vector2i vertex1, Vector2i vertex2, TGAImage& image, const TGAColor& color)
+void fill_colored_triangle(Vector2i vertex0, Vector2i vertex1, Vector2i vertex2, TGAImage& image, const TGAColor& color)
 {
     Vector2i min_bounding_box{image.get_width() - 1, image.get_height() - 1};
     Vector2i max_bounding_box{0, 0};
@@ -156,7 +156,7 @@ void bounding_box_fill_triangle(Vector2i vertex0, Vector2i vertex1, Vector2i ver
     }
 }
 
-void bounding_box_fill_triangle(Vector3i vertex0, Vector3i vertex1, Vector3i vertex2, std::vector<float>& depth_buffer, TGAImage& image, const TGAColor& color)
+void fill_colored_triangle(Vector3i vertex0, Vector3i vertex1, Vector3i vertex2, std::vector<float>& depth_buffer, TGAImage& image, const TGAColor& color)
 {
     Vector2i min_bounding_box{std::numeric_limits<int>::max(), std::numeric_limits<int>::max()};
     Vector2i max_bounding_box{std::numeric_limits<int>::min(), std::numeric_limits<int>::min()};
@@ -198,7 +198,7 @@ void bounding_box_fill_triangle(Vector3i vertex0, Vector3i vertex1, Vector3i ver
     }
 }
 
-void bounding_box_fill_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, Model& model, std::vector<float>& depth_buffer, TGAImage& image)
+void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, Model& model, std::vector<float>& depth_buffer, TGAImage& image)
 {
     Vector2i min_bounding_box{std::numeric_limits<int>::max(), std::numeric_limits<int>::max()};
     Vector2i max_bounding_box{std::numeric_limits<int>::min(), std::numeric_limits<int>::min()};
@@ -228,8 +228,7 @@ void bounding_box_fill_triangle(const std::array<Vector3i, 3>& vertices, const s
             auto z_coord = float(dot(barycentric, cast<float>(Vector3i{vertices[0].z, vertices[1].z, vertices[2].z})));
             const int index = static_cast<int>(draw_point.x + draw_point.y * image.get_width());
             
-            auto prevdepth = static_cast<int>(depth_buffer[index]);
-            if (static_cast<int>(depth_buffer[index]) < z_coord)
+            if (depth_buffer[index] < z_coord)
             {
                 const auto texture_u = dot(Vector3{uv_coordinates[0].x, uv_coordinates[1].x, uv_coordinates[2].x}, barycentric);
                 const auto texture_v = dot(Vector3{uv_coordinates[0].y, uv_coordinates[1].y, uv_coordinates[2].y}, barycentric);
@@ -242,7 +241,7 @@ void bounding_box_fill_triangle(const std::array<Vector3i, 3>& vertices, const s
     }
 }
 
-void bounding_box_fill_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, float light_intensity, Model& model, std::vector<float>& depth_buffer, TGAImage& image)
+void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, float light_intensity, Model& model, std::vector<float>& depth_buffer, TGAImage& image)
 {
     Vector2i min_bounding_box{std::numeric_limits<int>::max(), std::numeric_limits<int>::max()};
     Vector2i max_bounding_box{std::numeric_limits<int>::min(), std::numeric_limits<int>::min()};
@@ -272,8 +271,7 @@ void bounding_box_fill_triangle(const std::array<Vector3i, 3>& vertices, const s
             auto z_coord = float(dot(barycentric, cast<float>(Vector3i{vertices[0].z, vertices[1].z, vertices[2].z})));
             const int index = static_cast<int>(draw_point.x + draw_point.y * image.get_width());
             
-            auto prevdepth = static_cast<int>(depth_buffer[index]);
-            if (static_cast<int>(depth_buffer[index]) < z_coord)
+            if (depth_buffer[index] < z_coord)
             {
                 const auto texture_u = dot(Vector3{uv_coordinates[0].x, uv_coordinates[1].x, uv_coordinates[2].x}, barycentric);
                 const auto texture_v = dot(Vector3{uv_coordinates[0].y, uv_coordinates[1].y, uv_coordinates[2].y}, barycentric);

@@ -67,7 +67,7 @@ void draw_random_colored_triangles(const std::string& filename)
                                              static_cast<int>((world_coordinates.y + 1.0f) * height / 2.0f)};
         }
 
-        bounding_box_fill_triangle(screen_coordinates[0], screen_coordinates[1], screen_coordinates[2], image, TGAColor{random_uchar(), random_uchar(), random_uchar(), 255});
+        fill_colored_triangle(screen_coordinates[0], screen_coordinates[1], screen_coordinates[2], image, TGAColor{random_uchar(), random_uchar(), random_uchar(), 255});
     }
 
     image.flip_vertically(); // set origin to left bottom corner
@@ -103,8 +103,8 @@ void draw_back_face_culling(const std::string& filename)
         if (intensity > 0)
         {
             auto color = static_cast<unsigned char>(intensity * 255);
-            bounding_box_fill_triangle(screen_coordinates[0], screen_coordinates[1], screen_coordinates[2],
-                                       image, TGAColor{color, color, color, 255});
+            fill_colored_triangle(screen_coordinates[0], screen_coordinates[1], screen_coordinates[2],
+                                  image, TGAColor{color, color, color, 255});
         }
     }
 
@@ -140,8 +140,8 @@ void draw_depth_buffer(const std::string& filename)
         if (intensity > 0)
         {
             auto color = static_cast<unsigned char>(intensity * 255);
-            bounding_box_fill_triangle(screen_coordinates[0], screen_coordinates[1], screen_coordinates[2],
-                                        depth_buffer, image, TGAColor{color, color, color, 255});
+            fill_colored_triangle(screen_coordinates[0], screen_coordinates[1], screen_coordinates[2],
+                                  depth_buffer, image, TGAColor{color, color, color, 255});
         }
     }
 
@@ -178,7 +178,7 @@ void draw_textured_depth_buffer(const std::string& filename)
         
         if (intensity > 0)
         {
-            bounding_box_fill_triangle(screen_coordinates, uv_coordinates, model, depth_buffer, image);
+            fill_textured_triangle(screen_coordinates, uv_coordinates, model, depth_buffer, image);
         }
     }
 
@@ -224,7 +224,7 @@ void draw_perspective_projection(const std::string& filename)
         
         if (intensity > 0)
         {
-            bounding_box_fill_triangle(screen_coordinates, uv_coordinates, model, depth_buffer, image);
+            fill_textured_triangle(screen_coordinates, uv_coordinates, model, depth_buffer, image);
         }
     }
 
@@ -319,7 +319,7 @@ void draw_look_at(const std::string& filename)
         
         if (intensity > 0)
         {
-            bounding_box_fill_triangle(screen_coordinates, uv_coordinates, intensity, model, depth_buffer, image);
+            fill_textured_triangle(screen_coordinates, uv_coordinates, intensity, model, depth_buffer, image);
         }
     }
 
