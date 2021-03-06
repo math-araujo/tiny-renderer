@@ -6,6 +6,8 @@ add_subdirectory(external)
 add_executable(main
     src/main.cpp
     src/scenes.hpp src/scenes.cpp
+    src/shader.hpp src/shader.cpp
+    src/gouraudshader.hpp src/gouraudshader.cpp
     src/geometry.hpp src/geometry.cpp
     src/rendering.hpp src/rendering.cpp
     src/transform.hpp src/transform.cpp

@@ -28,14 +28,18 @@ public:
     int number_faces() const;
     Vector3f& vertex(int id);
     const Vector3f& vertex(int id) const;
+    Vector3f& vertex(int face, int vertex_number);
+    const Vector3f& vertex(int face, int vertex_number) const;
     std::vector<int> face(int id) const;
     std::vector<FaceElement>& face_element(int id);
     const std::vector<FaceElement>& face_element(int id) const;
     Vector2f uv(int face, int vertex);
     Vector2f uv(int index);
     TGAColor diffuse_map_at(Vector2f uv);
-    Vector3f normal(int face, int vertex);
-    Vector3f normal(int index);
+    Vector3f& normal(int face, int vertex);
+    const Vector3f& normal(int face, int vertex) const;
+    Vector3f& normal(int index);
+    const Vector3f& normal(int index) const;
 private:
     std::vector<Vector3f> vertices_;
     std::vector<std::vector<FaceElement>> faces_;

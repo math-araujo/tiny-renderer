@@ -7,6 +7,7 @@
 #include <vector>
 
 class Model;
+struct Shader;
 
 // Draw a line between start and end using the provided color
 void draw_line(Vector2i start, Vector2i end, TGAImage& image, TGAColor color);
@@ -28,5 +29,8 @@ void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::
 
 // Draw triangle using Gouraud shading
 void fill_triangle_gouraud(const std::array<Vector3i, 3>& vertices, const std::array<float, 3>& intensities, std::vector<float>& depth_buffer, TGAImage& image);
+
+// Final rasterization function, used to render Our GL
+void rasterize(const std::array<Vector3f, 3>& vertices, Shader& shader, TGAImage& image, std::vector<float>& depth_buffer);
 
 #endif // RENDERING_HPP

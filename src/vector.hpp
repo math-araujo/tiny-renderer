@@ -15,6 +15,36 @@ struct Vector2
     Vector2() {}
     Vector2(T x, T y): x{x}, y{y} {}
     
+    T& operator[](std::size_t index)
+    {
+        if (index == 0)
+        {
+            return x;
+        }
+        else if (index == 1)
+        {
+            return y;
+        }
+
+        std::cerr << "ERROR: index " << index << " out of range on Vector2<T>::operator[]\n";
+        return x; // meaningless...
+    }
+    
+    const T& operator[](std::size_t index) const 
+    {
+        if (index == 0)
+        {
+            return x;
+        }
+        else if (index == 1)
+        {
+            return y;
+        }
+
+        std::cerr << "ERROR: index " << index << " out of range on Vector2<T>::operator[]\n";
+        return x; // meaningless...
+    }
+
     Vector2& operator+=(const Vector2& v)
     {
         x += v.x;
@@ -61,6 +91,44 @@ struct Vector3
 
     Vector3() {}
     Vector3(T x, T y, T z): x{x}, y{y}, z{z} {}
+
+    T& operator[](std::size_t index)
+    {
+        if (index == 0)
+        {
+            return x;
+        }
+        else if (index == 1)
+        {
+            return y;
+        }
+        else if (index == 2)
+        {
+            return z;
+        }
+
+        std::cerr << "ERROR: index " << index << " out of range on Vector3<T>::operator[]\n";
+        return x; // meaningless...
+    }
+
+    const T& operator[](std::size_t index) const
+    {
+        if (index == 0)
+        {
+            return x;
+        }
+        else if (index == 1)
+        {
+            return y;
+        }
+        else if (index == 2)
+        {
+            return z;
+        }
+
+        std::cerr << "ERROR: index " << index << " out of range on Vector3<T>::operator[]\n";
+        return x; // meaningless...
+    }
 
     Vector3& operator+=(const Vector3& v)
     {
@@ -112,9 +180,8 @@ using Vector3i = Vector3<int>;
 template<typename TTarget, typename TFrom>
 Vector2<TTarget> cast(const Vector2<TFrom>& vector)
 {
-    return Vector3<TTarget>{static_cast<TTarget>(vector.x), 
-                            static_cast<TTarget>(vector.y), 
-                            static_cast<TTarget>(vector.z)};
+    return Vector2<TTarget>{static_cast<TTarget>(vector.x), 
+                            static_cast<TTarget>(vector.y)};
 }
 
 template<typename TTarget, typename TFrom>

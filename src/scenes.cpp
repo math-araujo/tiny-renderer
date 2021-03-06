@@ -1,4 +1,5 @@
 #include "scenes.hpp"
+#include "gouraudshader.hpp"
 #include "matrix.hpp"
 #include "model.hpp"
 #include "rendering.hpp"
@@ -315,7 +316,7 @@ void draw_look_at(const std::string& filename)
 
         Vector3f normal = cross(world_coordinates[2] - world_coordinates[0], world_coordinates[1] - world_coordinates[0]);
         normal.normalize();
-        double intensity = dot(normal, light_direction);
+        float intensity = float(dot(normal, light_direction));
         
         if (intensity > 0)
         {
@@ -325,4 +326,41 @@ void draw_look_at(const std::string& filename)
 
     image.flip_vertically(); // set origin to left bottom corner
     image.write_tga_file("8.look_at.tga"); 
+}
+
+void draw_our_gl(const std::string& filename)
+{
+    Model model{filename};
+    const int width = 600;
+    const int height = 600;
+    const int depth = 255;
+    TGAImage image{width, height, TGAImage::RGB};
+    const auto light_direction = unit_vector(Vector3f{1, 1, 1});
+    const Vector3f camera{1, 1, 3};
+    const Vector3f center{0, 0, 0};
+    std::vector<float> depth_buffer(width * height, std::numeric_limits<float>::lowest());
+    
+    Matrix view_matrix = look_at(camera, center, Vector3f{0, 1, 0});
+    //std::cerr << "View matrix:\n" << view_matrix << "\n";
+    Matrix projection_matrix = projection(float((camera - center).length()));
+    //std::cerr << "Projection matrix:\n" << projection_matrix << "\n";
+    const auto viewport_matrix = viewport(width / 8, height / 8, width * 3 / 4, height * 3 / 4, depth);
+    //std::cerr << "Viewport matrix:\n" << viewport_matrix << "\n";
+    const auto scene_transform = viewport_matrix * projection_matrix * view_matrix;
+    //std::cerr << "Final transform:\n" << scene_transform << "\n";
+    
+    Gouraud shader{model, scene_transform};
+    for (int i = 0; i < model.number_faces(); ++i)
+    {
+        std::array<Vector3f, 3> screen_coordinates;
+        for (int j = 0; j < 3; ++j)
+        {
+            screen_coordinates[j] = shader.vertex(light_direction, i, j);
+        }
+        
+        rasterize(screen_coordinates, shader, image, depth_buffer);
+    }
+
+    image.flip_vertically(); // set origin to left bottom corner
+    image.write_tga_file("9.our_gl.tga"); 
 }

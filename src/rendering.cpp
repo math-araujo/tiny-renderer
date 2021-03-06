@@ -2,6 +2,7 @@
 #include "geometry.hpp"
 #include "model.hpp"
 #include "rendering.hpp"
+#include "shader.hpp"
 #include "util.hpp"
 #include <algorithm>
 #include <cmath>
@@ -277,9 +278,7 @@ void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::
                 const auto texture_v = dot(Vector3{uv_coordinates[0].y, uv_coordinates[1].y, uv_coordinates[2].y}, barycentric);
                 const Vector2f texture{static_cast<float>(texture_u), static_cast<float>(texture_v)};
                 TGAColor color_texture = model.diffuse_map_at(texture);
-                TGAColor color{static_cast<unsigned char>(light_intensity * color_texture.r), 
-                               static_cast<unsigned char>(light_intensity * color_texture.g),
-                               static_cast<unsigned char>(light_intensity * color_texture.b), 255};
+                TGAColor color = color_texture * light_intensity;
                 depth_buffer[index] = z_coord;
                 image.set(draw_point.x, draw_point.y, color);
             }
@@ -327,4 +326,44 @@ void fill_triangle_gouraud(const std::array<Vector3i, 3>& vertices, const std::a
             }
         }
     }
+}
+
+void rasterize(const std::array<Vector3f, 3>& vertices, Shader& shader, TGAImage& image, std::vector<float>& depth_buffer)
+{
+    const Vector2i min_bounding_box = cast<int>(
+        Vector2f{std::max(0.0f, std::min(std::min(vertices[0].x, vertices[1].x), vertices[2].x)),
+                 std::max(0.0f, std::min(std::min(vertices[0].y, vertices[1].y), vertices[2].y))});
+    const Vector2i max_bounding_box = cast<int>(
+        Vector2f{std::min(image.get_width() - 1.0f, std::max(std::max(vertices[0].x, vertices[1].x), vertices[2].x)),
+                 std::min(image.get_height() - 1.0f, std::max(std::max(vertices[0].y, vertices[1].y), vertices[2].y))});
+
+    Vector3i draw_point;
+    for (draw_point.x = min_bounding_box.x; draw_point.x <= max_bounding_box.x; ++draw_point.x)
+    {
+        for (draw_point.y = min_bounding_box.y; draw_point.y <= max_bounding_box.y; ++draw_point.y)
+        {
+            const auto barycentric = barycentric_coordinates({cast<int>(vertices[0]), cast<int>(vertices[1]), cast<int>(vertices[2])},
+                                                              draw_point);
+            
+            if (barycentric.x < 0 || barycentric.y < 0 || barycentric.z < 0)
+            {
+                continue;
+            }
+
+            auto z_coord = float(dot(barycentric, Vector3f{vertices[0].z, vertices[1].z, vertices[2].z}));
+
+            const int index = static_cast<int>(draw_point.x + draw_point.y * image.get_width());
+            
+            if (depth_buffer[index] < z_coord)
+            {
+                TGAColor color;
+                bool discard = shader.fragment(barycentric, color);
+                if (!discard)
+                {
+                    depth_buffer[index] = z_coord;
+                    image.set(draw_point.x, draw_point.y, color);
+                }
+            }
+        }
+    }   
 }

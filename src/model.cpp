@@ -85,6 +85,18 @@ const Vector3f& Model::vertex(int id) const
     return vertices_[id];
 }
 
+Vector3f& Model::vertex(int face, int vertex_number)
+{
+    const auto vertex_index = faces_[face][vertex_number].vertex_index;
+    return vertices_[vertex_index];
+}
+
+const Vector3f& Model::vertex(int face, int vertex_number) const
+{
+    const auto vertex_index = faces_[face][vertex_number].vertex_index;
+    return vertices_[vertex_index];
+}
+
 std::vector<int> Model::face(int id) const
 {
     std::vector<int> faces_vertices;
@@ -126,13 +138,24 @@ TGAColor Model::diffuse_map_at(Vector2f uv)
     return diffuse_map_.get(uv_screen.x, uv_screen.y);
 }
 
-Vector3f Model::normal(int face, int vertex)
+Vector3f& Model::normal(int face, int vertex)
 {
     const auto index = faces_[face][vertex].normal_index;
     return normal(index);
 }
 
-Vector3f Model::normal(int index)
+const Vector3f& Model::normal(int face, int vertex) const
+{
+    const auto index = faces_[face][vertex].normal_index;
+    return normal(index);
+}
+
+Vector3f& Model::normal(int index)
+{
+    return normal_vectors_[index];
+}
+
+const Vector3f& Model::normal(int index) const
 {
     return normal_vectors_[index];
 }
