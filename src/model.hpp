@@ -33,9 +33,11 @@ public:
     std::vector<int> face(int id) const;
     std::vector<FaceElement>& face_element(int id);
     const std::vector<FaceElement>& face_element(int id) const;
-    Vector2f uv(int face, int vertex);
-    Vector2f uv(int index);
-    TGAColor diffuse_map_at(Vector2f uv);
+    Vector2f& uv(int face, int vertex);
+    const Vector2f& uv(int face, int vertex) const;
+    Vector2f& uv(int index);
+    const Vector2f& uv(int index) const;
+    TGAColor diffuse_map_at(Vector2f uv) const;
     Vector3f& normal(int face, int vertex);
     const Vector3f& normal(int face, int vertex) const;
     Vector3f& normal(int index);

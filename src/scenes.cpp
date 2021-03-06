@@ -3,6 +3,7 @@
 #include "matrix.hpp"
 #include "model.hpp"
 #include "rendering.hpp"
+#include "textureshader.hpp"
 #include "tgaimage.h"
 #include "transform.hpp"
 #include "util.hpp"
@@ -349,7 +350,8 @@ void draw_our_gl(const std::string& filename)
     const auto scene_transform = viewport_matrix * projection_matrix * view_matrix;
     //std::cerr << "Final transform:\n" << scene_transform << "\n";
     
-    Gouraud shader{model, scene_transform};
+    //Gouraud shader{model, scene_transform};
+    Texture shader{model, scene_transform};
     for (int i = 0; i < model.number_faces(); ++i)
     {
         std::array<Vector3f, 3> screen_coordinates;

@@ -120,18 +120,29 @@ const std::vector<FaceElement>& Model::face_element(int id) const
     return faces_[id];
 }
 
-Vector2f Model::uv(int face, int vertex)
+Vector2f& Model::uv(int face, int vertex)
 {
     const auto index = faces_[face][vertex].texture_index;
     return uv(index);
 }
 
-Vector2f Model::uv(int index)
+const Vector2f& Model::uv(int face, int vertex) const
+{
+    const auto index = faces_[face][vertex].texture_index;
+    return uv(index);
+}
+
+Vector2f& Model::uv(int index)
 {
     return uv_coordinates_[index];
 }
 
-TGAColor Model::diffuse_map_at(Vector2f uv)
+const Vector2f& Model::uv(int index) const
+{
+    return uv_coordinates_[index];
+}
+
+TGAColor Model::diffuse_map_at(Vector2f uv) const
 {
     Vector2i uv_screen{static_cast<int>(uv.x * diffuse_map_.get_width()),
                        static_cast<int>(uv.y * diffuse_map_.get_height())};
