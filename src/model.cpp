@@ -62,6 +62,8 @@ Model::Model(const std::string& filename)
                   << " Normal vectors: " << normal_vectors_.size() << "\n";
         
         load_model_texture(filename, "_diffuse.tga", diffuse_map_);
+        load_model_texture(filename, "_nm_tangent.tga", normal_map_);
+        load_model_texture(filename, "_spec.tga", specular_map_);
     }
 }
 
@@ -169,6 +171,23 @@ Vector3f& Model::normal(int index)
 const Vector3f& Model::normal(int index) const
 {
     return normal_vectors_[index];
+}
+
+Vector3f Model::normal_map_at(Vector2f uv) const
+{
+    const auto image_uv = cast<int>(Vector2f{uv.x * normal_map_.get_width(), uv.y * normal_map_.get_height()});
+    TGAColor color = normal_map_.get(image_uv.x, image_uv.y);
+
+    return Vector3f{static_cast<float>(color[2]) / 255.0f * 2.0f - 1.0f, 
+                    static_cast<float>(color[1]) / 255.0f * 2.0f - 1.0f,
+                    static_cast<float>(color[0]) / 255.0f * 2.0f - 1.0f};
+}
+
+float Model::specular_map_at(Vector2f uv) const
+{
+    const auto image_uv = cast<int>(Vector2f{uv.x * specular_map_.get_width(), uv.y * specular_map_.get_height()});
+
+    return static_cast<float>(specular_map_.get(image_uv.x, image_uv.y)[0]);
 }
 
 void load_model_texture(std::string filename, std::string suffix, TGAImage& image)

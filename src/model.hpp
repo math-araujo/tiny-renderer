@@ -42,6 +42,8 @@ public:
     const Vector3f& normal(int face, int vertex) const;
     Vector3f& normal(int index);
     const Vector3f& normal(int index) const;
+    Vector3f normal_map_at(Vector2f uv) const;
+    float specular_map_at(Vector2f uv) const;
 private:
     std::vector<Vector3f> vertices_;
     std::vector<std::vector<FaceElement>> faces_;
@@ -50,6 +52,8 @@ private:
     // For texture coordinates
     std::vector<Vector2f> uv_coordinates_;
     TGAImage diffuse_map_;
+    TGAImage normal_map_;
+    TGAImage specular_map_;
 };
 
 void load_model_texture(std::string filename, std::string suffix, TGAImage& image);

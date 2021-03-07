@@ -1,5 +1,5 @@
-#ifndef GOURAUD_SHADER_HPP
-#define GOURAUD_SHADER_HPP
+#ifndef BASIC_TEXTURE_HPP
+#define BASIC_TEXTURE_HPP
 
 #include "matrix.hpp"
 #include "shader.hpp"
@@ -7,7 +7,7 @@
 
 class Model;
 
-struct Gouraud: public Shader
+struct BasicTexture: Shader
 {
     const Model& model;
     Matrix uniform_mvp; // Projection * ModelView
@@ -17,11 +17,16 @@ struct Gouraud: public Shader
     Vector3f light_direction;
     
     Vector3f varying_intensity; // written by vertex shader, read by fragment shader
+    std::array<Vector2f, 3> varying_uv;
+    std::array<Vector3f, 3> varying_normal;
+    std::array<Matrix, 3> varying_triangle_coordinates;
+    std::array<Vector3f, 3> varying_ndc;
 
-    Gouraud(const Model& object, const Matrix& model_view_transform, 
-            const Matrix& viewport_transform, const Vector3f& light_dir);
+    BasicTexture(const Model& object, const Matrix& model_view_transform, 
+                 const Matrix& viewport_transform, const Vector3f& light_dir);
+
     Vector3f vertex(int face, int vertex_number) override;
     bool fragment(Vector3f barycentric_coordinates, TGAColor& color) override;
 };
 
-#endif // GOURAUD_SHADER_HPP
+#endif // BASIC_TEXTURE_HPP

@@ -8,6 +8,7 @@ add_executable(main
     src/scenes.hpp src/scenes.cpp
     src/shader.hpp src/shader.cpp
     src/gouraudshader.hpp src/gouraudshader.cpp
+    src/basictextureshader.hpp src/basictextureshader.cpp
     src/textureshader.hpp src/textureshader.cpp
     src/geometry.hpp src/geometry.cpp
     src/rendering.hpp src/rendering.cpp

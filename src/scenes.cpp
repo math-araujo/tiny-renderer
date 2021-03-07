@@ -1,3 +1,4 @@
+#include "basictextureshader.hpp"
 #include "scenes.hpp"
 #include "gouraudshader.hpp"
 #include "matrix.hpp"
@@ -347,22 +348,34 @@ void draw_our_gl(const std::string& filename)
     //std::cerr << "Projection matrix:\n" << projection_matrix << "\n";
     const auto viewport_matrix = viewport(width / 8, height / 8, width * 3 / 4, height * 3 / 4, depth);
     //std::cerr << "Viewport matrix:\n" << viewport_matrix << "\n";
-    const auto scene_transform = viewport_matrix * projection_matrix * view_matrix;
+    const auto model_view_projection_transform = projection_matrix * view_matrix;
+    const auto scene_transform = viewport_matrix * model_view_projection_transform;
     //std::cerr << "Final transform:\n" << scene_transform << "\n";
     
-    //Gouraud shader{model, scene_transform};
-    Texture shader{model, scene_transform};
+    //Gouraud shader{model, model_view_projection_transform, viewport_matrix, light_direction};
+    //BasicTexture shader{model, model_view_projection_transform, viewport_matrix, light_direction};
+    Texture shader{model, model_view_projection_transform, viewport_matrix, light_direction};
+
+    /*
+    //std::cout << "UNIFORM MVP:\n" << shader.uniform_mvp << "\n";
+    //std::cout << "UNIFORM MVP INVERSE TRANSPOSE:\n" << shader.uniform_mvpit << "\n";
+    //std::cout << "UNIFORM VIEWPORT:\n" << shader.uniform_viewport << "\n";
+    //std::cout << "UNIFORM LIGHT:\n" << shader.light_direction << "\n";
+    */
+
     for (int i = 0; i < model.number_faces(); ++i)
     {
         std::array<Vector3f, 3> screen_coordinates;
         for (int j = 0; j < 3; ++j)
         {
-            screen_coordinates[j] = shader.vertex(light_direction, i, j);
+            screen_coordinates[j] = shader.vertex(i, j);
         }
         
         rasterize(screen_coordinates, shader, image, depth_buffer);
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    image.write_tga_file("9.our_gl.tga"); 
+    //image.write_tga_file("9.our_gl_gouraud.tga"); 
+    //image.write_tga_file("9.our_gl_texture.tga"); 
+    image.write_tga_file("9.our_gl_normal.tga"); 
 }

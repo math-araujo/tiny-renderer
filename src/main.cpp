@@ -14,8 +14,8 @@ int main(int argc, char* argv[])
     draw_depth_buffer(filename);
     draw_textured_depth_buffer(filename);
     draw_perspective_projection(filename);
-    draw_gouraud_shading(filename);*/
-    draw_look_at(filename);
+    draw_gouraud_shading(filename);
+    draw_look_at(filename);*/
     draw_our_gl(filename);
 
     return 0;

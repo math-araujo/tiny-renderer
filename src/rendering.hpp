@@ -33,4 +33,6 @@ void fill_triangle_gouraud(const std::array<Vector3i, 3>& vertices, const std::a
 // Final rasterization function, used to render Our GL
 void rasterize(const std::array<Vector3f, 3>& vertices, Shader& shader, TGAImage& image, std::vector<float>& depth_buffer);
 
+void rasterize(const std::array<Vector4f, 3>& vertices, Shader& shader, TGAImage& image, std::vector<float>& depth_buffer);
+
 #endif // RENDERING_HPP
