@@ -3,6 +3,7 @@
 #include "gouraudshader.hpp"
 #include "matrix.hpp"
 #include "model.hpp"
+#include "phongshader.hpp"
 #include "rendering.hpp"
 #include "textureshader.hpp"
 #include "tgaimage.h"
@@ -354,7 +355,8 @@ void draw_our_gl(const std::string& filename)
     
     //Gouraud shader{model, model_view_projection_transform, viewport_matrix, light_direction};
     //BasicTexture shader{model, model_view_projection_transform, viewport_matrix, light_direction};
-    Texture shader{model, model_view_projection_transform, viewport_matrix, light_direction};
+    //Texture shader{model, model_view_projection_transform, viewport_matrix, light_direction};
+    Phong shader{model, model_view_projection_transform, viewport_matrix, light_direction};
 
     /*
     //std::cout << "UNIFORM MVP:\n" << shader.uniform_mvp << "\n";
@@ -377,5 +379,6 @@ void draw_our_gl(const std::string& filename)
     image.flip_vertically(); // set origin to left bottom corner
     //image.write_tga_file("9.our_gl_gouraud.tga"); 
     //image.write_tga_file("9.our_gl_texture.tga"); 
-    image.write_tga_file("9.our_gl_normal.tga"); 
+    //image.write_tga_file("9.our_gl_normal.tga"); 
+    image.write_tga_file("9.our_gl_phong.tga"); 
 }

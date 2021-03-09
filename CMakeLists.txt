@@ -10,6 +10,7 @@ add_executable(main
     src/gouraudshader.hpp src/gouraudshader.cpp
     src/basictextureshader.hpp src/basictextureshader.cpp
     src/textureshader.hpp src/textureshader.cpp
+    src/phongshader.hpp src/phongshader.cpp
     src/geometry.hpp src/geometry.cpp
     src/rendering.hpp src/rendering.cpp
     src/transform.hpp src/transform.cpp

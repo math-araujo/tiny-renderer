@@ -1,13 +1,13 @@
-#include "textureshader.hpp"
+#include "phongshader.hpp"
 #include "model.hpp"
 #include "transform.hpp"
 
-Texture::Texture(const Model& object, const Matrix& model_view_transform, const Matrix& viewport_transform, const Vector3f& light_dir):
+Phong::Phong(const Model& object, const Matrix& model_view_transform, const Matrix& viewport_transform, const Vector3f& light_dir):
     model{object}, uniform_mvp{model_view_transform}, uniform_mvpit{transpose(inverse_4x4(model_view_transform))}, uniform_viewport{viewport_transform},
     light_direction{unit_vector(homogeneous_to_cartesian(uniform_mvp * cartesian_to_homogeneous(light_dir, 0.0f)))}
     {}
 
-Vector3f Texture::vertex(int face, int vertex_number)
+Vector3f Phong::vertex(int face, int vertex_number)
 {
     varying_uv[vertex_number] = model.uv(face, vertex_number);
 
@@ -22,7 +22,7 @@ Vector3f Texture::vertex(int face, int vertex_number)
     return homogeneous_to_cartesian(uniform_viewport * gl_vertex);
 }
 
-bool Texture::fragment(Vector3f barycentric_coordinates, TGAColor& color)
+bool Phong::fragment(Vector3f barycentric_coordinates, TGAColor& color)
 {
     Vector2f uv{float(dot(barycentric_coordinates, Vector3f{varying_uv[0].x, varying_uv[1].x, varying_uv[2].x})),
                 float(dot(barycentric_coordinates, Vector3f{varying_uv[0].y, varying_uv[1].y, varying_uv[2].y}))};
@@ -50,7 +50,17 @@ bool Texture::fragment(Vector3f barycentric_coordinates, TGAColor& color)
 
     Vector3f n = unit_vector(B * model.normal_map_at(uv));
     const float diff = std::max(0.0f, float(dot(n, light_direction)));
-    color = model.diffuse_map_at(uv) * diff;
+
+    Vector3f reflected = unit_vector(2.0 * n * float(dot(n, light_direction)) - light_direction);
+    const float specular = std::pow(std::max(reflected.z, 0.0f), model.specular_map_at(uv) + 5.0f);
+    const float ambient = 10.0f;
+
+    TGAColor diffuse_color = model.diffuse_map_at(uv);
+    for (int i = 0; i < 3; ++i)
+    {
+        // Phong reflection: ambient, diffuse and specular components
+        color[i] = std::min(static_cast<int>(ambient + (diff + specular) * diffuse_color[i]), 255);
+    }
     
     return false;
 }
