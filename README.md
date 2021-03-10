@@ -1,9 +1,41 @@
 # Tiny Renderer
 
-A basic software rasterizer based on Sokolov's [Tiny Renderer](https://github.com/ssloy/tinyrenderer) and Gabriel Gambetta's [Compute Graphics from Scratch](https://www.gabrielgambetta.com/computer-graphics-from-scratch/).
+A basic software renderer based on Sokolov's [Tiny Renderer](https://github.com/ssloy/tinyrenderer) and Gabriel Gambetta's [Compute Graphics from Scratch](https://www.gabrielgambetta.com/computer-graphics-from-scratch/).
 
+> - [Description](#Description)
 > - [Gallery](#Gallery)
 > - [Building](#Building)
+
+<!-- -->
+## Description
+This repository implements a basic software renderer including space transformations (model-view, projection and viewport), a simple rasterizer and elementary shading functions.
+
+The code is structured to reproduce the output of each chapter of [Sokolov's book](https://github.com/ssloy/tinyrenderer), including
+four types of shaders for the last chapter. The result of executing the code is 12 images, whose descriptions are given below.
+
+Note that the implementation was incremental; therefore a posterior image likely uses the algorithms implemented on previous images (e.g. to render image 8, it's necessary to use almost all the algorithms used in images 1 to 7).
+
+
+A brief summary of the images generated and the algorithms implemented:
+
+
+1. __Wire frame model__: draw lines using the [Bresenham's Line Algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm) between the vertices of the triangles of the model;
+
+2. __Filled triangles__: fill the triangles with a random color by drawing horizontal lines between the triangle left and right ends;
+
+3. __Back Face Culling__: discard triangles that aren't visible based on the angle between the surface normal and the view vector, and colors the visible triangles proportionaly to the dot product of these vectors;
+
+4. __Depth Buffering__: for each pixel, determines the visible triangle (if any) by ordering the triangles using the z-coordinate, fixing the problems of the [Painter's algorithm](https://en.wikipedia.org/wiki/Painter%27s_algorithm); see more details here: [Hidden Surface Removal](https://www.gabrielgambetta.com/computer-graphics-from-scratch/12-hidden-surface-removal.html);
+
+5. __UV Textures__: add textures to the image rendered using depth buffering and back face culling;
+
+6. __Perspective Projection__: add [perspective projection](https://www.gabrielgambetta.com/computer-graphics-from-scratch/09-perspective-projection.html);
+
+7. __Gouraud Perspective__: similar to the previous image, but using [Gouraud Shading](https://en.wikipedia.org/wiki/Gouraud_shading) instead of textures to color the pixels;
+
+8. __View Transform__: add a camera transform to change the camera's point of view;
+
+9. __Our GL__: corresponds to images 9 to 12. Uses the previous algorithms to render a model and use [shading](https://www.gabrielgambetta.com/computer-graphics-from-scratch/13-shading.html) functions, such as Gouraud, a basic texture, a tangent space normal mapping texture and [Phong shading](https://en.wikipedia.org/wiki/Phong_shading).
 
 <!-- -->
 ## Gallery
