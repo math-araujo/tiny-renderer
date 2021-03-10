@@ -2,7 +2,7 @@
 
 int main(int argc, char* argv[])
 {
-    std::string filename{"obj/african_head.obj"};
+    std::string filename{"obj/african_head/african_head.obj"};
     if (argc == 2)
     {
         filename = argv[1];
