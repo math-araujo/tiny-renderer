@@ -42,4 +42,6 @@ void draw_look_at(const std::string& filename);
 // Chapter 6: Our GL with shaders
 void draw_our_gl(const std::string& filename, ShadersOptions shader_choice = ShadersOptions::NormalMappingTexture);
 
+std::string parse_filename(const std::string& filename, char target = '/');
+
 #endif // SCENES_HPP

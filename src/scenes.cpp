@@ -50,7 +50,8 @@ void draw_wire_mesh(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    image.write_tga_file("1.wire_mesh.tga");
+    const std::string output_file = "1." + parse_filename(filename) + "_wire_mesh.tga";
+    image.write_tga_file(output_file.c_str()); 
 }
 
 void draw_random_colored_triangles(const std::string& filename)
@@ -76,7 +77,8 @@ void draw_random_colored_triangles(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    image.write_tga_file("2.colored_filled_triangle.tga");
+    const std::string output_file = "2." + parse_filename(filename) + "_colored_filled_triangle.tga";
+    image.write_tga_file(output_file.c_str());
 }
 
 void draw_back_face_culling(const std::string& filename)
@@ -114,7 +116,8 @@ void draw_back_face_culling(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    image.write_tga_file("3.back_face_culling.tga");
+    const std::string output_file = "3." + parse_filename(filename) + "_back_face_culling.tga";
+    image.write_tga_file(output_file.c_str()); 
 }
 
 void draw_depth_buffer(const std::string& filename)
@@ -151,7 +154,8 @@ void draw_depth_buffer(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    image.write_tga_file("4.depth_buffer.tga");
+    const std::string output_file = "4." + parse_filename(filename) + "_depth_buffer.tga";
+    image.write_tga_file(output_file.c_str()); 
 }
 
 void draw_textured_depth_buffer(const std::string& filename)
@@ -188,7 +192,8 @@ void draw_textured_depth_buffer(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    image.write_tga_file("5.texture_depth_buffer.tga");   
+    const std::string output_file = "5." + parse_filename(filename) + "_texture_depth_buffer.tga";
+    image.write_tga_file(output_file.c_str()); 
 }
 
 void draw_perspective_projection(const std::string& filename)
@@ -231,7 +236,8 @@ void draw_perspective_projection(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    image.write_tga_file("6.projective_perspective.tga"); 
+    const std::string output_file = "6." + parse_filename(filename) + "_projective_perspective.tga";
+    image.write_tga_file(output_file.c_str()); 
 }
 
 void draw_gouraud_shading(const std::string& filename)
@@ -274,7 +280,8 @@ void draw_gouraud_shading(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    image.write_tga_file("7.perspective_gouraud_shading.tga"); 
+    const std::string output_file = "7." + parse_filename(filename) + "_perspective_gouraud_shading.tga";
+    image.write_tga_file(output_file.c_str()); 
 }
 
 void draw_look_at(const std::string& filename)
@@ -319,7 +326,8 @@ void draw_look_at(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    image.write_tga_file("8.look_at.tga"); 
+    const std::string output_file = "8." + parse_filename(filename) + "_look_at.tga";
+    image.write_tga_file(output_file.c_str()); 
 }
 
 void draw_our_gl(const std::string& filename, ShadersOptions shader_choice)
@@ -341,7 +349,7 @@ void draw_our_gl(const std::string& filename, ShadersOptions shader_choice)
     const auto scene_transform = viewport_matrix * model_view_projection_transform;
     
     std::unique_ptr<Shader> shader;
-    std::string output_file{"9.our_gl"};
+    std::string output_file{"9." + parse_filename(filename) + "_our_gl"};
     if (shader_choice == ShadersOptions::Gouraud)
     {
         shader = std::make_unique<Gouraud>(model, model_view_projection_transform, viewport_matrix, light_direction);
@@ -376,4 +384,17 @@ void draw_our_gl(const std::string& filename, ShadersOptions shader_choice)
 
     image.flip_vertically(); // set origin to left bottom corner
     image.write_tga_file(output_file.c_str()); 
+}
+
+std::string parse_filename(const std::string& filename, char target)
+{
+    const auto target_position = filename.find_last_of(target);
+    const std::size_t extension_size = 4;
+    
+    if (target_position == std::string::npos) 
+    {
+        return filename.substr(0, filename.size() - extension_size - 1);
+    }
+
+    return filename.substr(target_position + 1, filename.size() - target_position - extension_size - 1);
 }
