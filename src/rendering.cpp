@@ -199,7 +199,7 @@ void fill_colored_triangle(Vector3i vertex0, Vector3i vertex1, Vector3i vertex2,
     }
 }
 
-void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, Model& model, std::vector<float>& depth_buffer, TGAImage& image)
+void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, const Model& model, std::vector<float>& depth_buffer, TGAImage& image)
 {
     Vector2i min_bounding_box{std::numeric_limits<int>::max(), std::numeric_limits<int>::max()};
     Vector2i max_bounding_box{std::numeric_limits<int>::min(), std::numeric_limits<int>::min()};
@@ -242,7 +242,7 @@ void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::
     }
 }
 
-void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, float light_intensity, Model& model, std::vector<float>& depth_buffer, TGAImage& image)
+void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, float light_intensity, const Model& model, std::vector<float>& depth_buffer, TGAImage& image)
 {
     Vector2i min_bounding_box{std::numeric_limits<int>::max(), std::numeric_limits<int>::max()};
     Vector2i max_bounding_box{std::numeric_limits<int>::min(), std::numeric_limits<int>::min()};

@@ -202,11 +202,8 @@ void draw_perspective_projection(const std::string& filename)
     std::vector<float> depth_buffer(width * height, std::numeric_limits<float>::lowest());
     
     Matrix projection_matrix = projection(camera.z);
-    //std::cout << "Projection matrix:\n" << projection_matrix << "\n";
     const auto viewport_matrix = viewport(width / 8, height / 8, width * 3 / 4, height * 3 / 4, depth);
-    //std::cout << "Viewport matrix:\n" << viewport_matrix << "\n";
     const auto projection_transform = viewport_matrix * projection_matrix;
-    //std::cout << "Projection transform:\n" << projection_transform << "\n";
     
     for (int i = 0; i < model.number_faces(); ++i)
     {
@@ -238,7 +235,7 @@ void draw_perspective_projection(const std::string& filename)
 
 void draw_gouraud_shading(const std::string& filename)
 {
-    Model model{filename};
+    const Model model{filename};
     const int width = 600;
     const int height = 600;
     const int depth = 255;
@@ -247,12 +244,9 @@ void draw_gouraud_shading(const std::string& filename)
     const Vector3f camera{0, 0, 3};
     std::vector<float> depth_buffer(width * height, std::numeric_limits<float>::lowest());
     
-    Matrix projection_matrix = projection(camera.z);
-    //std::cout << "Projection matrix:\n" << projection_matrix << "\n";
+    const Matrix projection_matrix = projection(camera.z);
     const auto viewport_matrix = viewport(width / 8, height / 8, width * 3 / 4, height * 3 / 4, depth);
-    //std::cout << "Viewport matrix:\n" << viewport_matrix << "\n";
     const auto projection_transform = viewport_matrix * projection_matrix;
-    //std::cout << "Projection transform:\n" << projection_transform << "\n";
     
     for (int i = 0; i < model.number_faces(); ++i)
     {
@@ -284,7 +278,7 @@ void draw_gouraud_shading(const std::string& filename)
 
 void draw_look_at(const std::string& filename)
 {
-    Model model{filename};
+    const Model model{filename};
     const int width = 600;
     const int height = 600;
     const int depth = 255;
@@ -294,14 +288,10 @@ void draw_look_at(const std::string& filename)
     const Vector3f center{0, 0, 0};
     std::vector<float> depth_buffer(width * height, std::numeric_limits<float>::lowest());
     
-    Matrix view_matrix = look_at(camera, center, Vector3f{0, 1, 0});
-    //std::cerr << "View matrix:\n" << view_matrix << "\n";
-    Matrix projection_matrix = projection(float((camera - center).length()));
-    //std::cerr << "Projection matrix:\n" << projection_matrix << "\n";
+    const Matrix view_matrix = look_at(camera, center, Vector3f{0, 1, 0});
+    const Matrix projection_matrix = projection(float((camera - center).length()));
     const auto viewport_matrix = viewport(width / 8, height / 8, width * 3 / 4, height * 3 / 4, depth);
-    //std::cerr << "Viewport matrix:\n" << viewport_matrix << "\n";
     const auto scene_transform = viewport_matrix * projection_matrix * view_matrix;
-    //std::cerr << "Final transform:\n" << scene_transform << "\n";
     
     for (int i = 0; i < model.number_faces(); ++i)
     {
@@ -333,7 +323,7 @@ void draw_look_at(const std::string& filename)
 
 void draw_our_gl(const std::string& filename)
 {
-    Model model{filename};
+    const Model model{filename};
     const int width = 600;
     const int height = 600;
     const int depth = 255;
@@ -343,27 +333,16 @@ void draw_our_gl(const std::string& filename)
     const Vector3f center{0, 0, 0};
     std::vector<float> depth_buffer(width * height, std::numeric_limits<float>::lowest());
     
-    Matrix view_matrix = look_at(camera, center, Vector3f{0, 1, 0});
-    //std::cerr << "View matrix:\n" << view_matrix << "\n";
-    Matrix projection_matrix = projection(float((camera - center).length()));
-    //std::cerr << "Projection matrix:\n" << projection_matrix << "\n";
+    const Matrix view_matrix = look_at(camera, center, Vector3f{0, 1, 0});
+    const Matrix projection_matrix = projection(float((camera - center).length()));
     const auto viewport_matrix = viewport(width / 8, height / 8, width * 3 / 4, height * 3 / 4, depth);
-    //std::cerr << "Viewport matrix:\n" << viewport_matrix << "\n";
     const auto model_view_projection_transform = projection_matrix * view_matrix;
     const auto scene_transform = viewport_matrix * model_view_projection_transform;
-    //std::cerr << "Final transform:\n" << scene_transform << "\n";
     
     //Gouraud shader{model, model_view_projection_transform, viewport_matrix, light_direction};
     //BasicTexture shader{model, model_view_projection_transform, viewport_matrix, light_direction};
     //Texture shader{model, model_view_projection_transform, viewport_matrix, light_direction};
     Phong shader{model, model_view_projection_transform, viewport_matrix, light_direction};
-
-    /*
-    //std::cout << "UNIFORM MVP:\n" << shader.uniform_mvp << "\n";
-    //std::cout << "UNIFORM MVP INVERSE TRANSPOSE:\n" << shader.uniform_mvpit << "\n";
-    //std::cout << "UNIFORM VIEWPORT:\n" << shader.uniform_viewport << "\n";
-    //std::cout << "UNIFORM LIGHT:\n" << shader.light_direction << "\n";
-    */
 
     for (int i = 0; i < model.number_faces(); ++i)
     {
