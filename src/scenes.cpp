@@ -13,6 +13,7 @@
 #include <array>
 #include <cmath>
 #include <limits>
+#include <memory>
 #include <vector>
 
 Vector3i world_to_screen(Vector3f pos, int width, int height)
@@ -321,7 +322,7 @@ void draw_look_at(const std::string& filename)
     image.write_tga_file("8.look_at.tga"); 
 }
 
-void draw_our_gl(const std::string& filename)
+void draw_our_gl(const std::string& filename, ShadersOptions shader_choice)
 {
     const Model model{filename};
     const int width = 600;
@@ -339,25 +340,40 @@ void draw_our_gl(const std::string& filename)
     const auto model_view_projection_transform = projection_matrix * view_matrix;
     const auto scene_transform = viewport_matrix * model_view_projection_transform;
     
-    //Gouraud shader{model, model_view_projection_transform, viewport_matrix, light_direction};
-    //BasicTexture shader{model, model_view_projection_transform, viewport_matrix, light_direction};
-    //Texture shader{model, model_view_projection_transform, viewport_matrix, light_direction};
-    Phong shader{model, model_view_projection_transform, viewport_matrix, light_direction};
+    std::unique_ptr<Shader> shader;
+    std::string output_file{"9.our_gl"};
+    if (shader_choice == ShadersOptions::Gouraud)
+    {
+        shader = std::make_unique<Gouraud>(model, model_view_projection_transform, viewport_matrix, light_direction);
+        output_file += "_gouraud.tga";
+    }
+    else if (shader_choice == ShadersOptions::BasicTexture)
+    {
+        shader = std::make_unique<BasicTexture>(model, model_view_projection_transform, viewport_matrix, light_direction);
+        output_file += "_basic_texture.tga";
+    }
+    else if (shader_choice == ShadersOptions::NormalMappingTexture)
+    {
+        shader = std::make_unique<Texture>(model, model_view_projection_transform, viewport_matrix, light_direction);
+        output_file += "_normal_mapping.tga";
+    }
+    else if (shader_choice == ShadersOptions::Phong)
+    {
+        shader = std::make_unique<Phong>(model, model_view_projection_transform, viewport_matrix, light_direction);
+        output_file += "_phong.tga";
+    }
 
     for (int i = 0; i < model.number_faces(); ++i)
     {
         std::array<Vector3f, 3> screen_coordinates;
         for (int j = 0; j < 3; ++j)
         {
-            screen_coordinates[j] = shader.vertex(i, j);
+            screen_coordinates[j] = shader->vertex(i, j);
         }
         
-        rasterize(screen_coordinates, shader, image, depth_buffer);
+        rasterize(screen_coordinates, *shader, image, depth_buffer);
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    //image.write_tga_file("9.our_gl_gouraud.tga"); 
-    //image.write_tga_file("9.our_gl_texture.tga"); 
-    //image.write_tga_file("9.our_gl_normal.tga"); 
-    image.write_tga_file("9.our_gl_phong.tga"); 
+    image.write_tga_file(output_file.c_str()); 
 }

@@ -4,6 +4,15 @@
 #include "vector.hpp"
 #include <string>
 
+// List of available shaders
+enum class ShadersOptions
+{
+    Gouraud,
+    BasicTexture,
+    NormalMappingTexture,
+    Phong
+};
+
 Vector3i world_to_screen(Vector3f pos, int width, int heigth);
 
 // Chapter 1 final render: wire frame mesh
@@ -31,6 +40,6 @@ void draw_gouraud_shading(const std::string& filename);
 void draw_look_at(const std::string& filename);
 
 // Chapter 6: Our GL with shaders
-void draw_our_gl(const std::string& filename);
+void draw_our_gl(const std::string& filename, ShadersOptions shader_choice = ShadersOptions::NormalMappingTexture);
 
 #endif // SCENES_HPP
