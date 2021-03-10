@@ -3,6 +3,7 @@
 
 #include "vector.hpp"
 #include <array>
+#include <limits>
 
 // Compute the barycentric coordinates of a point with respect to the triangle specified by the vertices
 template<typename T>

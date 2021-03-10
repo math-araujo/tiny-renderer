@@ -2,23 +2,11 @@ cmake_minimum_required(VERSION 3.12)
 project(tiny-renderer)
 
 add_subdirectory(external)
+add_subdirectory(src/math)
+add_subdirectory(src/geometry)
+add_subdirectory(src/shaders)
+add_subdirectory(src/rasterization)
 
-add_executable(main
-    src/main.cpp
-    src/scenes.hpp src/scenes.cpp
-    src/shader.hpp src/shader.cpp
-    src/gouraudshader.hpp src/gouraudshader.cpp
-    src/basictextureshader.hpp src/basictextureshader.cpp
-    src/textureshader.hpp src/textureshader.cpp
-    src/phongshader.hpp src/phongshader.cpp
-    src/geometry.hpp src/geometry.cpp
-    src/rendering.hpp src/rendering.cpp
-    src/transform.hpp src/transform.cpp
-    src/matrix.hpp src/matrix.cpp
-    src/vector.hpp
-    src/model.hpp src/model.cpp
-    src/util.hpp
-    )
-    
+add_executable(main src/main.cpp src/scenes.hpp src/scenes.cpp)    
 target_compile_features(main PRIVATE cxx_std_17)
-target_link_libraries(main PRIVATE tgaimage)
+target_link_libraries(main PRIVATE tgaimage math geometry shaders rasterization)

@@ -1,11 +1,11 @@
-#include "model.hpp"
+#include "trianglemesh.hpp"
 
 #include <cassert>
 #include <fstream>
 #include <string>
 #include <sstream>
 
-Model::Model(const std::string& filename)
+TriangleMesh::TriangleMesh(const std::string& filename)
 {
     std::ifstream input_file{filename};
     
@@ -67,39 +67,39 @@ Model::Model(const std::string& filename)
     }
 }
 
-int Model::number_vertices() const 
+int TriangleMesh::number_vertices() const 
 {
     return static_cast<int>(vertices_.size());
 }
 
-int Model::number_faces() const 
+int TriangleMesh::number_faces() const 
 {
     return static_cast<int>(faces_.size());
 }
 
-Vector3f& Model::vertex(int id)
+Vector3f& TriangleMesh::vertex(int id)
 {
     return vertices_[id];
 }
 
-const Vector3f& Model::vertex(int id) const
+const Vector3f& TriangleMesh::vertex(int id) const
 {
     return vertices_[id];
 }
 
-Vector3f& Model::vertex(int face, int vertex_number)
+Vector3f& TriangleMesh::vertex(int face, int vertex_number)
 {
     const auto vertex_index = faces_[face][vertex_number].vertex_index;
     return vertices_[vertex_index];
 }
 
-const Vector3f& Model::vertex(int face, int vertex_number) const
+const Vector3f& TriangleMesh::vertex(int face, int vertex_number) const
 {
     const auto vertex_index = faces_[face][vertex_number].vertex_index;
     return vertices_[vertex_index];
 }
 
-std::vector<int> Model::face(int id) const
+std::vector<int> TriangleMesh::face(int id) const
 {
     std::vector<int> faces_vertices;
     faces_vertices.reserve(faces_[id].size());
@@ -112,68 +112,68 @@ std::vector<int> Model::face(int id) const
     return faces_vertices;
 }
 
-std::vector<FaceElement>& Model::face_element(int id)
+std::vector<FaceElement>& TriangleMesh::face_element(int id)
 {
     return faces_[id];
 }
 
-const std::vector<FaceElement>& Model::face_element(int id) const
+const std::vector<FaceElement>& TriangleMesh::face_element(int id) const
 {
     return faces_[id];
 }
 
-Vector2f& Model::uv(int face, int vertex)
+Vector2f& TriangleMesh::uv(int face, int vertex)
 {
     const auto index = faces_[face][vertex].texture_index;
     return uv(index);
 }
 
-const Vector2f& Model::uv(int face, int vertex) const
+const Vector2f& TriangleMesh::uv(int face, int vertex) const
 {
     const auto index = faces_[face][vertex].texture_index;
     return uv(index);
 }
 
-Vector2f& Model::uv(int index)
+Vector2f& TriangleMesh::uv(int index)
 {
     return uv_coordinates_[index];
 }
 
-const Vector2f& Model::uv(int index) const
+const Vector2f& TriangleMesh::uv(int index) const
 {
     return uv_coordinates_[index];
 }
 
-TGAColor Model::diffuse_map_at(Vector2f uv) const
+TGAColor TriangleMesh::diffuse_map_at(Vector2f uv) const
 {
     Vector2i uv_screen{static_cast<int>(uv.x * diffuse_map_.get_width()),
                        static_cast<int>(uv.y * diffuse_map_.get_height())};
     return diffuse_map_.get(uv_screen.x, uv_screen.y);
 }
 
-Vector3f& Model::normal(int face, int vertex)
+Vector3f& TriangleMesh::normal(int face, int vertex)
 {
     const auto index = faces_[face][vertex].normal_index;
     return normal(index);
 }
 
-const Vector3f& Model::normal(int face, int vertex) const
+const Vector3f& TriangleMesh::normal(int face, int vertex) const
 {
     const auto index = faces_[face][vertex].normal_index;
     return normal(index);
 }
 
-Vector3f& Model::normal(int index)
+Vector3f& TriangleMesh::normal(int index)
 {
     return normal_vectors_[index];
 }
 
-const Vector3f& Model::normal(int index) const
+const Vector3f& TriangleMesh::normal(int index) const
 {
     return normal_vectors_[index];
 }
 
-Vector3f Model::normal_map_at(Vector2f uv) const
+Vector3f TriangleMesh::normal_map_at(Vector2f uv) const
 {
     const auto image_uv = cast<int>(Vector2f{uv.x * normal_map_.get_width(), uv.y * normal_map_.get_height()});
     TGAColor color = normal_map_.get(image_uv.x, image_uv.y);
@@ -183,7 +183,7 @@ Vector3f Model::normal_map_at(Vector2f uv) const
                     static_cast<float>(color[0]) / 255.0f * 2.0f - 1.0f};
 }
 
-float Model::specular_map_at(Vector2f uv) const
+float TriangleMesh::specular_map_at(Vector2f uv) const
 {
     const auto image_uv = cast<int>(Vector2f{uv.x * specular_map_.get_width(), uv.y * specular_map_.get_height()});
 

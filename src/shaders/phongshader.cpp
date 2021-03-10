@@ -1,8 +1,8 @@
 #include "phongshader.hpp"
-#include "model.hpp"
 #include "transform.hpp"
+#include "trianglemesh.hpp"
 
-Phong::Phong(const Model& object, const Matrix& model_view_transform, const Matrix& viewport_transform, const Vector3f& light_dir):
+Phong::Phong(const TriangleMesh& object, const Matrix& model_view_transform, const Matrix& viewport_transform, const Vector3f& light_dir):
     model{object}, uniform_mvp{model_view_transform}, uniform_mvpit{transpose(inverse_4x4(model_view_transform))}, uniform_viewport{viewport_transform},
     light_direction{unit_vector(homogeneous_to_cartesian(uniform_mvp * cartesian_to_homogeneous(light_dir, 0.0f)))}
     {}

@@ -5,13 +5,13 @@
 #include "shader.hpp"
 #include <array>
 
-class Model;
+class TriangleMesh;
 
 // Texture with tangent space normal mapping
 
 struct Texture: Shader
 {
-    const Model& model;
+    const TriangleMesh& model;
     Matrix uniform_mvp; // Projection * ModelView
     Matrix uniform_mvpit; // Inverse of transpose of Projection * ModelView
     Matrix uniform_viewport;
@@ -23,7 +23,7 @@ struct Texture: Shader
     std::array<Matrix, 3> varying_triangle_coordinates;
     std::array<Vector3f, 3> varying_ndc;
 
-    Texture(const Model& object, const Matrix& model_view_transform, 
+    Texture(const TriangleMesh& object, const Matrix& model_view_transform, 
             const Matrix& viewport_transform, const Vector3f& light_dir);
 
     Vector3f vertex(int face, int vertex_number) override;

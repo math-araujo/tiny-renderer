@@ -1,5 +1,5 @@
-#ifndef UTIL_HPP
-#define UTIL_HPP
+#ifndef RANDOM_HPP
+#define RANDOM_HPP
 
 #include <cmath>
 #include <random>
@@ -29,4 +29,4 @@ inline unsigned char random_uchar()
     return static_cast<unsigned char>(random_double(0, 256));
 }
 
-#endif // UTIL_HPP
+#endif // RANDOM_HPP

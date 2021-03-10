@@ -1,9 +1,9 @@
 #include "rendering.hpp"
 #include "geometry.hpp"
-#include "model.hpp"
+#include "random.hpp"
 #include "rendering.hpp"
 #include "shader.hpp"
-#include "util.hpp"
+#include "trianglemesh.hpp"
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -199,7 +199,7 @@ void fill_colored_triangle(Vector3i vertex0, Vector3i vertex1, Vector3i vertex2,
     }
 }
 
-void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, const Model& model, std::vector<float>& depth_buffer, TGAImage& image)
+void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, const TriangleMesh& model, std::vector<float>& depth_buffer, TGAImage& image)
 {
     Vector2i min_bounding_box{std::numeric_limits<int>::max(), std::numeric_limits<int>::max()};
     Vector2i max_bounding_box{std::numeric_limits<int>::min(), std::numeric_limits<int>::min()};
@@ -231,8 +231,8 @@ void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::
             
             if (depth_buffer[index] < z_coord)
             {
-                const auto texture_u = dot(Vector3{uv_coordinates[0].x, uv_coordinates[1].x, uv_coordinates[2].x}, barycentric);
-                const auto texture_v = dot(Vector3{uv_coordinates[0].y, uv_coordinates[1].y, uv_coordinates[2].y}, barycentric);
+                const auto texture_u = dot(Vector3f{uv_coordinates[0].x, uv_coordinates[1].x, uv_coordinates[2].x}, barycentric);
+                const auto texture_v = dot(Vector3f{uv_coordinates[0].y, uv_coordinates[1].y, uv_coordinates[2].y}, barycentric);
                 const Vector2f texture{static_cast<float>(texture_u), static_cast<float>(texture_v)};
                 TGAColor color = model.diffuse_map_at(texture);
                 depth_buffer[index] = z_coord;
@@ -242,7 +242,7 @@ void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::
     }
 }
 
-void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, float light_intensity, const Model& model, std::vector<float>& depth_buffer, TGAImage& image)
+void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, float light_intensity, const TriangleMesh& model, std::vector<float>& depth_buffer, TGAImage& image)
 {
     Vector2i min_bounding_box{std::numeric_limits<int>::max(), std::numeric_limits<int>::max()};
     Vector2i max_bounding_box{std::numeric_limits<int>::min(), std::numeric_limits<int>::min()};
@@ -274,8 +274,8 @@ void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::
             
             if (depth_buffer[index] < z_coord)
             {
-                const auto texture_u = dot(Vector3{uv_coordinates[0].x, uv_coordinates[1].x, uv_coordinates[2].x}, barycentric);
-                const auto texture_v = dot(Vector3{uv_coordinates[0].y, uv_coordinates[1].y, uv_coordinates[2].y}, barycentric);
+                const auto texture_u = dot(Vector3f{uv_coordinates[0].x, uv_coordinates[1].x, uv_coordinates[2].x}, barycentric);
+                const auto texture_v = dot(Vector3f{uv_coordinates[0].y, uv_coordinates[1].y, uv_coordinates[2].y}, barycentric);
                 const Vector2f texture{static_cast<float>(texture_u), static_cast<float>(texture_v)};
                 TGAColor color_texture = model.diffuse_map_at(texture);
                 TGAColor color = color_texture * light_intensity;
@@ -319,7 +319,7 @@ void fill_triangle_gouraud(const std::array<Vector3i, 3>& vertices, const std::a
             
             if (depth_buffer[index] < z_coord)
             {
-                const auto intensity = float(dot(Vector3{intensities[0], intensities[1], intensities[2]}, barycentric));
+                const auto intensity = float(dot(Vector3f{intensities[0], intensities[1], intensities[2]}, barycentric));
                 const auto color = static_cast<unsigned char>(255 * intensity);
                 depth_buffer[index] = z_coord;
                 image.set(draw_point.x, draw_point.y, TGAColor{color, color, color, 255});

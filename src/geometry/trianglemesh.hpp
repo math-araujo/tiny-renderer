@@ -1,5 +1,5 @@
-#ifndef MODEL_HPP
-#define MODEL_HPP
+#ifndef TRIANGLE_MESH_HPP
+#define TRIANGLE_MESH_HPP
 
 #include "tgaimage.h"
 #include "vector.hpp"
@@ -20,10 +20,10 @@ struct FaceElement
     FaceElement(int vertex, int texture, int normal): vertex_index{vertex}, texture_index{texture}, normal_index{normal} {}
 };
 
-class Model
+class TriangleMesh
 {
 public:
-    explicit Model(const std::string& filename);
+    explicit TriangleMesh(const std::string& filename);
     int number_vertices() const;
     int number_faces() const;
     Vector3f& vertex(int id);
@@ -58,4 +58,4 @@ private:
 
 void load_model_texture(std::string filename, std::string suffix, TGAImage& image);
 
-#endif // MODEL_HPP
+#endif // TRIANGLE_MESH_HPP

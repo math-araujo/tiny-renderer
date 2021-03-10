@@ -1,8 +1,8 @@
 #include "basictextureshader.hpp"
-#include "model.hpp"
+#include "trianglemesh.hpp"
 #include "transform.hpp"
 
-BasicTexture::BasicTexture(const Model& object, const Matrix& model_view_transform, const Matrix& viewport_transform, const Vector3f& light_dir):
+BasicTexture::BasicTexture(const TriangleMesh& object, const Matrix& model_view_transform, const Matrix& viewport_transform, const Vector3f& light_dir):
     model{object}, uniform_mvp{model_view_transform}, uniform_mvpit{transpose(inverse_4x4(model_view_transform))}, 
     uniform_viewport{viewport_transform}, scene_transform{uniform_viewport * uniform_mvp}, light_direction{light_dir}
     {}

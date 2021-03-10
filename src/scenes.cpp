@@ -2,13 +2,13 @@
 #include "scenes.hpp"
 #include "gouraudshader.hpp"
 #include "matrix.hpp"
-#include "model.hpp"
 #include "phongshader.hpp"
 #include "rendering.hpp"
 #include "textureshader.hpp"
 #include "tgaimage.h"
 #include "transform.hpp"
-#include "util.hpp"
+#include "trianglemesh.hpp"
+#include "random.hpp"
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -23,7 +23,7 @@ Vector3i world_to_screen(Vector3f pos, int width, int height)
 
 void draw_wire_mesh(const std::string& filename)
 {
-    const Model model{filename};
+    const TriangleMesh model{filename};
     const int width = 600;
     const int height = 600;
     TGAImage image{width, height, TGAImage::RGB};
@@ -56,7 +56,7 @@ void draw_wire_mesh(const std::string& filename)
 
 void draw_random_colored_triangles(const std::string& filename)
 {
-    const Model model{filename};
+    const TriangleMesh model{filename};
     const int width = 600;
     const int height = 600;
     TGAImage image{width, height, TGAImage::RGB};
@@ -83,7 +83,7 @@ void draw_random_colored_triangles(const std::string& filename)
 
 void draw_back_face_culling(const std::string& filename)
 {
-    const Model model{filename};
+    const TriangleMesh model{filename};
     const int width = 600;
     const int height = 600;
     TGAImage image{width, height, TGAImage::RGB};
@@ -122,7 +122,7 @@ void draw_back_face_culling(const std::string& filename)
 
 void draw_depth_buffer(const std::string& filename)
 {
-    const Model model{filename};
+    const TriangleMesh model{filename};
     const int width = 600;
     const int height = 600;
     TGAImage image{width, height, TGAImage::RGB};
@@ -160,7 +160,7 @@ void draw_depth_buffer(const std::string& filename)
 
 void draw_textured_depth_buffer(const std::string& filename)
 {
-    Model model{filename};
+    TriangleMesh model{filename};
     const int width = 600;
     const int height = 600;
     TGAImage image{width, height, TGAImage::RGB};
@@ -198,7 +198,7 @@ void draw_textured_depth_buffer(const std::string& filename)
 
 void draw_perspective_projection(const std::string& filename)
 {
-    Model model{filename};
+    TriangleMesh model{filename};
     const int width = 600;
     const int height = 600;
     const int depth = 255;
@@ -242,7 +242,7 @@ void draw_perspective_projection(const std::string& filename)
 
 void draw_gouraud_shading(const std::string& filename)
 {
-    const Model model{filename};
+    const TriangleMesh model{filename};
     const int width = 600;
     const int height = 600;
     const int depth = 255;
@@ -286,7 +286,7 @@ void draw_gouraud_shading(const std::string& filename)
 
 void draw_look_at(const std::string& filename)
 {
-    const Model model{filename};
+    const TriangleMesh model{filename};
     const int width = 600;
     const int height = 600;
     const int depth = 255;
@@ -332,7 +332,7 @@ void draw_look_at(const std::string& filename)
 
 void draw_our_gl(const std::string& filename, ShadersOptions shader_choice)
 {
-    const Model model{filename};
+    const TriangleMesh model{filename};
     const int width = 600;
     const int height = 600;
     const int depth = 255;

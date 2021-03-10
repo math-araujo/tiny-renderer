@@ -1,11 +1,11 @@
 #include "gouraudshader.hpp"
 
 #include "matrix.hpp"
-#include "model.hpp"
 #include "transform.hpp"
+#include "trianglemesh.hpp"
 #include <algorithm>
 
-Gouraud::Gouraud(const Model& object, const Matrix& model_view_transform, const Matrix& viewport_transform, const Vector3f& light_dir):
+Gouraud::Gouraud(const TriangleMesh& object, const Matrix& model_view_transform, const Matrix& viewport_transform, const Vector3f& light_dir):
     model{object}, uniform_mvp{model_view_transform}, uniform_mvpit{transpose(inverse_4x4(model_view_transform))}, 
     uniform_viewport{viewport_transform}, scene_transform{uniform_viewport * uniform_mvp}, light_direction{light_dir}
 {}

@@ -6,7 +6,7 @@
 #include <array>
 #include <vector>
 
-class Model;
+class TriangleMesh;
 struct Shader;
 
 // Draw a line between start and end using the provided color
@@ -22,10 +22,10 @@ void fill_colored_triangle(Vector2i vertex0, Vector2i vertex1, Vector2i vertex2,
 void fill_colored_triangle(Vector3i vertex0, Vector3i vertex1, Vector3i vertex2, std::vector<float>& depth_buffer, TGAImage& image, const TGAColor& color);
 
 // Draw a filled triangle using the Bounding Box algorithm and depth buffering using an image texture
-void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, const Model& model, std::vector<float>& depth_buffer, TGAImage& image);
+void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, const TriangleMesh& model, std::vector<float>& depth_buffer, TGAImage& image);
 
 // Draw a filled triangle using the Bounding Box algorithm and depth buffering using an image texture
-void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, float light_intensity, const Model& model, std::vector<float>& depth_buffer, TGAImage& image);
+void fill_textured_triangle(const std::array<Vector3i, 3>& vertices, const std::array<Vector2f, 3>& uv_coordinates, float light_intensity, const TriangleMesh& model, std::vector<float>& depth_buffer, TGAImage& image);
 
 // Draw triangle using Gouraud shading
 void fill_triangle_gouraud(const std::array<Vector3i, 3>& vertices, const std::array<float, 3>& intensities, std::vector<float>& depth_buffer, TGAImage& image);
