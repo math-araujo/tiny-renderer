@@ -249,32 +249,34 @@ void draw_gouraud_shading(const std::string& filename)
     TGAImage image{width, height, TGAImage::RGB};
     const Vector3f light_direction{0, 0, -1};
     const Vector3f camera{0, 0, 3};
+    const Vector3f center{0, 0, 0};
     std::vector<float> depth_buffer(width * height, std::numeric_limits<float>::lowest());
     
-    const Matrix projection_matrix = projection(camera.z);
+    const auto view_matrix = look_at(camera, center, Vector3f{0, 1, 0});
+    const auto projection_matrix = projection(float((camera - center).length()));
     const auto viewport_matrix = viewport(width / 8, height / 8, width * 3 / 4, height * 3 / 4, depth);
-    const auto projection_transform = viewport_matrix * projection_matrix;
-    
+    const auto scene_transform = viewport_matrix * projection_matrix * view_matrix;
+
     for (int i = 0; i < model.number_faces(); ++i)
     {
         const auto& face = model.face(i);
 
         std::array<Vector3f, 3> world_coordinates;
         std::array<Vector3i, 3> screen_coordinates;
-        std::array<float, 3> intensities;
         for (int j = 0; j < 3; ++j)
         {
             world_coordinates[j] = model.vertex(face[j]);
-            screen_coordinates[j] = cast<int>(homogeneous_to_cartesian(projection_transform * cartesian_to_homogeneous(world_coordinates[j])));
-            intensities[j] = float(dot(model.normal(i, j), light_direction));
+            screen_coordinates[j] = cast<int>(homogeneous_to_cartesian(scene_transform * cartesian_to_homogeneous(world_coordinates[j])));
         }
 
         Vector3f normal = cross(world_coordinates[2] - world_coordinates[0], world_coordinates[1] - world_coordinates[0]);
         normal.normalize();
-        double intensity = dot(normal, light_direction);
+        float intensity = float(dot(normal, light_direction));
         
         if (intensity > 0)
         {
+            std::array<float, 3> intensities;
+            std::fill(intensities.begin(), intensities.end(), intensity);
             fill_triangle_gouraud(screen_coordinates, intensities, depth_buffer, image);
         }
     }
@@ -296,8 +298,8 @@ void draw_look_at(const std::string& filename)
     const Vector3f center{0, 0, 0};
     std::vector<float> depth_buffer(width * height, std::numeric_limits<float>::lowest());
     
-    const Matrix view_matrix = look_at(camera, center, Vector3f{0, 1, 0});
-    const Matrix projection_matrix = projection(float((camera - center).length()));
+    const auto view_matrix = look_at(camera, center, Vector3f{0, 1, 0});
+    const auto projection_matrix = projection(float((camera - center).length()));
     const auto viewport_matrix = viewport(width / 8, height / 8, width * 3 / 4, height * 3 / 4, depth);
     const auto scene_transform = viewport_matrix * projection_matrix * view_matrix;
     
@@ -342,8 +344,8 @@ void draw_our_gl(const std::string& filename, ShadersOptions shader_choice)
     const Vector3f center{0, 0, 0};
     std::vector<float> depth_buffer(width * height, std::numeric_limits<float>::lowest());
     
-    const Matrix view_matrix = look_at(camera, center, Vector3f{0, 1, 0});
-    const Matrix projection_matrix = projection(float((camera - center).length()));
+    const auto view_matrix = look_at(camera, center, Vector3f{0, 1, 0});
+    const auto projection_matrix = projection(float((camera - center).length()));
     const auto viewport_matrix = viewport(width / 8, height / 8, width * 3 / 4, height * 3 / 4, depth);
     const auto model_view_projection_transform = projection_matrix * view_matrix;
     const auto scene_transform = viewport_matrix * model_view_projection_transform;

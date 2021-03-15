@@ -19,7 +19,7 @@ Note that the implementation was incremental; therefore a posterior image likely
 A brief summary of the images generated and the algorithms implemented:
 
 
-1. __Wire frame model__: draw lines using the [Bresenham's Line Algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm) between the vertices of the triangles of the model;
+1. __Wire frame model__: draw lines between the vertices of the triangles of the model using the [Bresenham's Line Algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm);
 
 2. __Filled triangles__: fill the triangles with a random color by drawing horizontal lines between the triangle left and right ends;
 
