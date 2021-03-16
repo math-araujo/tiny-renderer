@@ -2,8 +2,10 @@
 #define MATHEMATICAL_VECTOR_HPP
 
 #include <cmath>
+#include <exception>
 #include <iostream>
 #include <type_traits>
+#include <utility>
 
 // SFINAE to allow only numeric types
 template<typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value, T>>
@@ -17,17 +19,7 @@ struct Vector2
     
     T& operator[](std::size_t index)
     {
-        if (index == 0)
-        {
-            return x;
-        }
-        else if (index == 1)
-        {
-            return y;
-        }
-
-        std::cerr << "ERROR: index " << index << " out of range on Vector2<T>::operator[]\n";
-        return x; // meaningless...
+        return const_cast<T&>(std::as_const(*this)[index]);
     }
     
     const T& operator[](std::size_t index) const 
@@ -41,8 +33,7 @@ struct Vector2
             return y;
         }
 
-        std::cerr << "ERROR: index " << index << " out of range on Vector2<T>::operator[]\n";
-        return x; // meaningless...
+        throw std::invalid_argument("index out of range on Vector2<T>::operator[]\n");
     }
 
     Vector2& operator+=(const Vector2& v)
@@ -94,21 +85,7 @@ struct Vector3
 
     T& operator[](std::size_t index)
     {
-        if (index == 0)
-        {
-            return x;
-        }
-        else if (index == 1)
-        {
-            return y;
-        }
-        else if (index == 2)
-        {
-            return z;
-        }
-
-        std::cerr << "ERROR: index " << index << " out of range on Vector3<T>::operator[]\n";
-        return x; // meaningless...
+        return const_cast<T&>(std::as_const(*this)[index]);
     }
 
     const T& operator[](std::size_t index) const
@@ -126,8 +103,7 @@ struct Vector3
             return z;
         }
 
-        std::cerr << "ERROR: index " << index << " out of range on Vector3<T>::operator[]\n";
-        return x; // meaningless...
+        throw std::invalid_argument("index out of range on Vector3<T>::operator[]\n");
     }
 
     Vector3& operator+=(const Vector3& v)
@@ -183,25 +159,7 @@ struct Vector4
 
     T& operator[](std::size_t index)
     {
-        if (index == 0)
-        {
-            return x;
-        }
-        else if (index == 1)
-        {
-            return y;
-        }
-        else if (index == 2)
-        {
-            return z;
-        }
-        else if (index == 3)
-        {
-            return w;
-        }
-
-        std::cerr << "ERROR: index " << index << " out of range on Vector4<T>::operator[]\n";
-        return x; // meaningless...
+        return const_cast<T&>(std::as_const(*this)[index]);
     }
 
     const T& operator[](std::size_t index) const
@@ -223,8 +181,7 @@ struct Vector4
             return w;
         }
 
-        std::cerr << "ERROR: index " << index << " out of range on Vector4<T>::operator[]\n";
-        return x; // meaningless...
+        throw std::invalid_argument("index out of range on Vector4<T>::operator[]\n");
     }
 
     Vector4& operator+=(const Vector4& v)
