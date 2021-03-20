@@ -5,9 +5,7 @@
 #include "phongshader.hpp"
 #include "rendering.hpp"
 #include "textureshader.hpp"
-#include "tgaimage.h"
 #include "transform.hpp"
-#include "trianglemesh.hpp"
 #include "random.hpp"
 #include <algorithm>
 #include <array>
@@ -21,12 +19,13 @@ Vector3i world_to_screen(Vector3f pos, int width, int height)
     return Vector3i{int((pos.x + 1.0f) * width / 2.0f), int((pos.y + 1.0f) * height / 2.0f), int((pos.z + 1.0) * 255 / 2.0f)};
 }
 
-void draw_wire_mesh(const std::string& filename)
+Scenes::Scenes(const std::string& filename, int image_width, int image_height): 
+    model{filename}, model_name{parse_filename(filename)}, width{image_width}, height{image_height}, 
+    image{image_width, image_height, TGAImage::RGB}
+{}
+
+void Scenes::draw_wire_mesh()
 {
-    const TriangleMesh model{filename};
-    const int width = 600;
-    const int height = 600;
-    TGAImage image{width, height, TGAImage::RGB};
     const TGAColor white{255, 255, 255, 255};
     const TGAColor red{255, 0, 0, 255};
     
@@ -50,17 +49,13 @@ void draw_wire_mesh(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    const std::string output_file = "1." + parse_filename(filename) + "_wire_mesh.tga";
+    const std::string output_file = "1." + model_name + "_wire_mesh.tga";
     image.write_tga_file(output_file.c_str()); 
+    image.clear();
 }
 
-void draw_random_colored_triangles(const std::string& filename)
-{
-    const TriangleMesh model{filename};
-    const int width = 600;
-    const int height = 600;
-    TGAImage image{width, height, TGAImage::RGB};
-    
+void Scenes::draw_random_colored_triangles()
+{    
     for (int i = 0; i < model.number_faces(); ++i)
     {
         const auto& face = model.face(i);
@@ -77,16 +72,13 @@ void draw_random_colored_triangles(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    const std::string output_file = "2." + parse_filename(filename) + "_colored_filled_triangle.tga";
+    const std::string output_file = "2." + model_name + "_colored_filled_triangle.tga";
     image.write_tga_file(output_file.c_str());
+    image.clear();
 }
 
-void draw_back_face_culling(const std::string& filename)
+void Scenes::draw_back_face_culling()
 {
-    const TriangleMesh model{filename};
-    const int width = 600;
-    const int height = 600;
-    TGAImage image{width, height, TGAImage::RGB};
     const Vector3f light_direction{0, 0, -1};
 
     for (int i = 0; i < model.number_faces(); ++i)
@@ -116,16 +108,13 @@ void draw_back_face_culling(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    const std::string output_file = "3." + parse_filename(filename) + "_back_face_culling.tga";
+    const std::string output_file = "3." + model_name + "_back_face_culling.tga";
     image.write_tga_file(output_file.c_str()); 
+    image.clear();
 }
 
-void draw_depth_buffer(const std::string& filename)
+void Scenes::draw_depth_buffer()
 {
-    const TriangleMesh model{filename};
-    const int width = 600;
-    const int height = 600;
-    TGAImage image{width, height, TGAImage::RGB};
     const Vector3f light_direction{0, 0, -1};
     std::vector<float> depth_buffer(width * height, std::numeric_limits<float>::lowest());
 
@@ -154,16 +143,13 @@ void draw_depth_buffer(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    const std::string output_file = "4." + parse_filename(filename) + "_depth_buffer.tga";
+    const std::string output_file = "4." + model_name + "_depth_buffer.tga";
     image.write_tga_file(output_file.c_str()); 
+    image.clear();
 }
 
-void draw_textured_depth_buffer(const std::string& filename)
+void Scenes::draw_textured_depth_buffer()
 {
-    TriangleMesh model{filename};
-    const int width = 600;
-    const int height = 600;
-    TGAImage image{width, height, TGAImage::RGB};
     const Vector3f light_direction{0, 0, -1};
     std::vector<float> depth_buffer(width * height, std::numeric_limits<float>::lowest());
 
@@ -192,17 +178,13 @@ void draw_textured_depth_buffer(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    const std::string output_file = "5." + parse_filename(filename) + "_texture_depth_buffer.tga";
+    const std::string output_file = "5." + model_name + "_texture_depth_buffer.tga";
     image.write_tga_file(output_file.c_str()); 
+    image.clear();
 }
 
-void draw_perspective_projection(const std::string& filename)
+void Scenes::draw_perspective_projection()
 {
-    TriangleMesh model{filename};
-    const int width = 600;
-    const int height = 600;
-    const int depth = 255;
-    TGAImage image{width, height, TGAImage::RGB};
     const Vector3f light_direction{0, 0, -1};
     const Vector3f camera{0, 0, 3};
     std::vector<float> depth_buffer(width * height, std::numeric_limits<float>::lowest());
@@ -236,17 +218,13 @@ void draw_perspective_projection(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    const std::string output_file = "6." + parse_filename(filename) + "_projective_perspective.tga";
+    const std::string output_file = "6." + model_name + "_projective_perspective.tga";
     image.write_tga_file(output_file.c_str()); 
+    image.clear();
 }
 
-void draw_gouraud_shading(const std::string& filename)
+void Scenes::draw_gouraud_shading()
 {
-    const TriangleMesh model{filename};
-    const int width = 600;
-    const int height = 600;
-    const int depth = 255;
-    TGAImage image{width, height, TGAImage::RGB};
     const Vector3f light_direction{0, 0, -1};
     const Vector3f camera{0, 0, 3};
     const Vector3f center{0, 0, 0};
@@ -282,17 +260,13 @@ void draw_gouraud_shading(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    const std::string output_file = "7." + parse_filename(filename) + "_perspective_gouraud_shading.tga";
+    const std::string output_file = "7." + model_name + "_perspective_gouraud_shading.tga";
     image.write_tga_file(output_file.c_str()); 
+    image.clear();
 }
 
-void draw_look_at(const std::string& filename)
+void Scenes::draw_look_at()
 {
-    const TriangleMesh model{filename};
-    const int width = 600;
-    const int height = 600;
-    const int depth = 255;
-    TGAImage image{width, height, TGAImage::RGB};
     const Vector3f light_direction{0, 0, -1};
     const Vector3f camera{1, 1, 3};
     const Vector3f center{0, 0, 0};
@@ -328,17 +302,13 @@ void draw_look_at(const std::string& filename)
     }
 
     image.flip_vertically(); // set origin to left bottom corner
-    const std::string output_file = "8." + parse_filename(filename) + "_look_at.tga";
+    const std::string output_file = "8." + model_name + "_look_at.tga";
     image.write_tga_file(output_file.c_str()); 
+    image.clear();
 }
 
-void draw_our_gl(const std::string& filename, ShadersOptions shader_choice)
+void Scenes::draw_our_gl(ShadersOptions shader_choice)
 {
-    const TriangleMesh model{filename};
-    const int width = 600;
-    const int height = 600;
-    const int depth = 255;
-    TGAImage image{width, height, TGAImage::RGB};
     const auto light_direction = unit_vector(Vector3f{1, 1, 1});
     const Vector3f camera{1, 1, 3};
     const Vector3f center{0, 0, 0};
@@ -351,7 +321,7 @@ void draw_our_gl(const std::string& filename, ShadersOptions shader_choice)
     const auto scene_transform = viewport_matrix * model_view_projection_transform;
     
     std::unique_ptr<Shader> shader;
-    std::string output_file{"9." + parse_filename(filename) + "_our_gl"};
+    std::string output_file{"9." + model_name + "_our_gl"};
     if (shader_choice == ShadersOptions::Gouraud)
     {
         shader = std::make_unique<Gouraud>(model, model_view_projection_transform, viewport_matrix, light_direction);
@@ -386,6 +356,7 @@ void draw_our_gl(const std::string& filename, ShadersOptions shader_choice)
 
     image.flip_vertically(); // set origin to left bottom corner
     image.write_tga_file(output_file.c_str()); 
+    image.clear();
 }
 
 std::string parse_filename(const std::string& filename, char target)
