@@ -7,7 +7,6 @@
 Matrix cartesian_to_homogeneous(Vector3f vector, float w = 1.0f);
 Matrix homogenize(Matrix matrix);
 Vector3f homogeneous_to_cartesian(Matrix matrix);
-Vector3f drop_homogeneous_coordinate(Matrix matrix);
 Matrix viewport(int x, int y, int width, int heigth, int depth);
 Matrix projection(float eye);
 

@@ -17,13 +17,15 @@ Matrix homogenize(Matrix temp)
 
 Vector3f homogeneous_to_cartesian(Matrix matrix)
 {
-    auto abs_w = std::abs(matrix[3][0]);
-    return Vector3f{matrix[0][0] / abs_w, matrix[1][0] / abs_w, matrix[2][0] / abs_w};
-}
+    const auto w = matrix[3][0];
+    
+    if (w == 0)
+    {
+        return Vector3f{matrix[0][0], matrix[1][0], matrix[2][0]};
+    }
 
-Vector3f drop_homogeneous_coordinate(Matrix matrix)
-{
-    return Vector3f{matrix[0][0], matrix[1][0], matrix[2][0]};
+    const auto abs_w = std::abs(w);
+    return Vector3f{matrix[0][0] / abs_w, matrix[1][0] / abs_w, matrix[2][0] / abs_w};
 }
 
 Matrix viewport(int x, int y, int width, int heigth, int depth)

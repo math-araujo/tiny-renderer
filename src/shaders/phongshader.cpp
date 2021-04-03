@@ -10,11 +10,8 @@ Phong::Phong(const TriangleMesh& object, const Matrix& model_view_transform, con
 Vector3f Phong::vertex(int face, int vertex_number)
 {
     varying_uv[vertex_number] = model.uv(face, vertex_number);
-
     varying_intensity[vertex_number] = std::max(0.0f, float(dot(model.normal(face, vertex_number), light_direction)));
-    
-    // homogeneous_to_cartesian(uniform_mvpit * cartesian_to_homogeneous(model.normal(face, vertex_number), 0.0f)) doesn't work, why??
-    varying_normal[vertex_number] = drop_homogeneous_coordinate(uniform_mvpit * cartesian_to_homogeneous(model.normal(face, vertex_number), 0.0f));
+    varying_normal[vertex_number] = homogeneous_to_cartesian(uniform_mvpit * cartesian_to_homogeneous(model.normal(face, vertex_number), 0.0f));
 
     const auto gl_vertex = uniform_mvp * cartesian_to_homogeneous(model.vertex(face, vertex_number));
     varying_triangle_coordinates[vertex_number] = gl_vertex;
