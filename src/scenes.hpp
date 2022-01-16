@@ -28,7 +28,7 @@ public:
     // Chapter 2 render: triangles filled with random colors
     void draw_random_colored_triangles();
 
-    // Chapter 2 final render: triangles filled with colors proportional to lighthing intensity
+    // Chapter 2 final render: triangles filled with colors proportional to lighting intensity
     void draw_back_face_culling();
 
     // Chapter 3 final render: model with back face culling and depth buffering 
