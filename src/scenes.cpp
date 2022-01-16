@@ -225,8 +225,8 @@ void Scenes::draw_perspective_projection()
 
 void Scenes::draw_gouraud_shading()
 {
-    const Vector3f light_direction{0, 0, -1};
-    const Vector3f camera{0, 0, 3};
+    const Vector3f light_direction = unit_vector(Vector3f{1, -1, 1});
+    const Vector3f camera{1, 1, 3};
     const Vector3f center{0, 0, 0};
     std::vector<float> depth_buffer(width * height, std::numeric_limits<float>::lowest());
     
@@ -238,25 +238,18 @@ void Scenes::draw_gouraud_shading()
     for (int i = 0; i < model.number_faces(); ++i)
     {
         const auto& face = model.face(i);
-
         std::array<Vector3f, 3> world_coordinates;
         std::array<Vector3i, 3> screen_coordinates;
+        std::array<float, 3> intensities;
+        
         for (int j = 0; j < 3; ++j)
         {
             world_coordinates[j] = model.vertex(face[j]);
             screen_coordinates[j] = cast<int>(homogeneous_to_cartesian(scene_transform * cartesian_to_homogeneous(world_coordinates[j])));
+            intensities[j] = std::max(0.0f, float(dot(model.normal(i, j), light_direction)));
         }
 
-        Vector3f normal = cross(world_coordinates[2] - world_coordinates[0], world_coordinates[1] - world_coordinates[0]);
-        normal.normalize();
-        float intensity = float(dot(normal, light_direction));
-        
-        if (intensity > 0)
-        {
-            std::array<float, 3> intensities;
-            std::fill(intensities.begin(), intensities.end(), intensity);
-            fill_triangle_gouraud(screen_coordinates, intensities, depth_buffer, image);
-        }
+        fill_triangle_gouraud(screen_coordinates, intensities, depth_buffer, image);
     }
 
     image.flip_vertically(); // set origin to left bottom corner
